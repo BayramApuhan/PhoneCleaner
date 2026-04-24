@@ -53,6 +53,16 @@
     <string name="apk_empty">APK dosyası bulunamadı.</string>
     <string name="apk_scanning">APK\'lar taranıyor…</string>
 
+    <!-- Settings -->
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_appearance">Görünüm</string>
+    <string name="settings_scanning">Tarama</string>
+    <string name="settings_large_threshold">Büyük dosya eşiği</string>
+    <string name="settings_hide_system">Sistem uygulamalarını gizle</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+
     <!-- Common -->
     <string name="confirm_delete_title">Silmeyi onayla</string>
     <string name="confirm_delete_body">%1$d öğe (%2$s) kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>

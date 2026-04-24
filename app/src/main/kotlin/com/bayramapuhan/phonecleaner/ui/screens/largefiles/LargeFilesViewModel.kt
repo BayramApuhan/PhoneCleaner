@@ -2,6 +2,7 @@ package com.bayramapuhan.phonecleaner.ui.screens.largefiles
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.data.repository.FileRepository
 import com.bayramapuhan.phonecleaner.domain.model.DeleteResult
 import com.bayramapuhan.phonecleaner.domain.model.FileItem
@@ -10,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ sealed interface LargeFilesEvent {
 @HiltViewModel
 class LargeFilesViewModel @Inject constructor(
     private val repo: FileRepository,
+    private val prefs: AppPreferences,
 ) : ViewModel() {
     private val _state = MutableStateFlow(LargeFilesUiState())
     val state: StateFlow<LargeFilesUiState> = _state.asStateFlow()
@@ -46,10 +49,19 @@ class LargeFilesViewModel @Inject constructor(
     private val _events = Channel<LargeFilesEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
+    init {
+        viewModelScope.launch {
+            prefs.largeFileThresholdMb.collect { mb ->
+                _state.update { it.copy(thresholdMb = mb) }
+            }
+        }
+    }
+
     fun scan() {
         viewModelScope.launch {
-            _state.update { it.copy(loading = true, error = null, selected = emptySet()) }
-            val threshold = _state.value.thresholdMb.toLong() * 1024L * 1024L
+            val mb = prefs.largeFileThresholdMb.first()
+            _state.update { it.copy(loading = true, error = null, selected = emptySet(), thresholdMb = mb) }
+            val threshold = mb.toLong() * 1024L * 1024L
             runCatching { repo.findLargeFiles(threshold) }
                 .onSuccess { result -> _state.update { it.copy(loading = false, files = result) } }
                 .onFailure { e -> _state.update { it.copy(loading = false, error = e.message) } }
@@ -82,6 +94,4 @@ class LargeFilesViewModel @Inject constructor(
             }
         }
     }
-
-    fun setThreshold(mb: Int) = _state.update { it.copy(thresholdMb = mb) }
 }

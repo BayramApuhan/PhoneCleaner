@@ -2,12 +2,14 @@ package com.bayramapuhan.phonecleaner.ui.screens.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.data.repository.AppRepository
 import com.bayramapuhan.phonecleaner.domain.model.AppItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,16 +33,23 @@ data class AppsUiState(
 @HiltViewModel
 class AppsViewModel @Inject constructor(
     private val repo: AppRepository,
+    private val prefs: AppPreferences,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AppsUiState(loading = true))
     val state: StateFlow<AppsUiState> = _state.asStateFlow()
 
-    init { load() }
+    init {
+        viewModelScope.launch {
+            prefs.hideSystemApps.collect { _ -> load() }
+        }
+    }
 
     fun load() {
         viewModelScope.launch {
+            val hideSystem = prefs.hideSystemApps.first()
             _state.update { it.copy(loading = true) }
-            val list = runCatching { repo.loadInstalledApps() }.getOrDefault(emptyList())
+            val list = runCatching { repo.loadInstalledApps(includeSystem = !hideSystem) }
+                .getOrDefault(emptyList())
             _state.update { it.copy(loading = false, apps = sorted(list, it.sort)) }
         }
     }
