@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PhoneCleaner</string>
+
+    <!-- Home -->
+    <string name="home_title">Telefonum</string>
+    <string name="home_subtitle">Cihazını temiz ve hızlı tut</string>
+    <string name="feature_storage">Depolama Analizi</string>
+    <string name="feature_storage_desc">Hangi şey ne kadar yer kaplıyor</string>
+    <string name="feature_large_files">Büyük Dosyalar</string>
+    <string name="feature_large_files_desc">Yer kaplayan dosyaları bul ve sil</string>
+    <string name="feature_apps">Uygulama Yöneticisi</string>
+    <string name="feature_apps_desc">Kurulu uygulamaları yönet</string>
+    <string name="feature_apk">APK Temizleyici</string>
+    <string name="feature_apk_desc">Gereksiz APK dosyalarını temizle</string>
+
+    <!-- Permissions -->
+    <string name="perm_required_title">İzin gerekli</string>
+    <string name="perm_storage_msg">Bu özellik için depolama erişim iznine ihtiyacımız var.</string>
+    <string name="perm_all_files_msg">Tüm dosyalara erişim için ayarlardan izin vermen gerekiyor.</string>
+    <string name="perm_grant">İzin ver</string>
+    <string name="perm_open_settings">Ayarları aç</string>
+
+    <!-- Storage -->
+    <string name="storage_title">Depolama</string>
+    <string name="storage_used">Kullanılan</string>
+    <string name="storage_free">Boş</string>
+    <string name="storage_total">Toplam</string>
+    <string name="storage_category_images">Fotoğraflar</string>
+    <string name="storage_category_videos">Videolar</string>
+    <string name="storage_category_audio">Ses</string>
+    <string name="storage_category_apps">Uygulamalar</string>
+    <string name="storage_category_other">Diğer</string>
+
+    <!-- Large files -->
+    <string name="large_files_title">Büyük Dosyalar</string>
+    <string name="large_files_threshold">Eşik: %1$s</string>
+    <string name="large_files_empty">Eşik üstü dosya bulunamadı.</string>
+    <string name="large_files_scanning">Taranıyor…</string>
+    <string name="action_delete">Sil</string>
+    <string name="action_select_all">Tümünü seç</string>
+    <string name="action_clear_selection">Seçimi temizle</string>
+
+    <!-- Apps -->
+    <string name="apps_title">Uygulamalar</string>
+    <string name="apps_sort_size">Boyuta göre</string>
+    <string name="apps_sort_name">İsme göre</string>
+    <string name="apps_uninstall">Kaldır</string>
+    <string name="apps_loading">Uygulamalar yükleniyor…</string>
+
+    <!-- APK -->
+    <string name="apk_title">APK Temizleyici</string>
+    <string name="apk_empty">APK dosyası bulunamadı.</string>
+    <string name="apk_scanning">APK\'lar taranıyor…</string>
+
+    <!-- Common -->
+    <string name="confirm_delete">%1$d öğeyi silmek istediğine emin misin?</string>
+    <string name="cancel">İptal</string>
+    <string name="ok">Tamam</string>
+</resources>
