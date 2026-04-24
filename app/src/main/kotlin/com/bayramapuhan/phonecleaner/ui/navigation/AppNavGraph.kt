@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bayramapuhan.phonecleaner.ui.screens.about.AboutScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apk.ApkScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apps.AppsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.home.HomeScreen
@@ -18,6 +19,7 @@ object Routes {
     const val APPS = "apps"
     const val APK = "apk"
     const val SETTINGS = "settings"
+    const val ABOUT = "about"
 }
 
 @Composable
@@ -37,6 +39,12 @@ fun AppNavGraph() {
         composable(Routes.LARGE_FILES) { LargeFilesScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APPS) { AppsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APK) { ApkScreen(onBack = { nav.popBackStack() }) }
-        composable(Routes.SETTINGS) { SettingsScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBack = { nav.popBackStack() },
+                onOpenAbout = { nav.navigate(Routes.ABOUT) },
+            )
+        }
+        composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
     }
 }

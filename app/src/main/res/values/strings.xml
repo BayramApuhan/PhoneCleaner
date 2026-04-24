@@ -59,9 +59,16 @@
     <string name="settings_scanning">Tarama</string>
     <string name="settings_large_threshold">Büyük dosya eşiği</string>
     <string name="settings_hide_system">Sistem uygulamalarını gizle</string>
+    <string name="settings_about">Hakkında</string>
     <string name="theme_system">Sistem</string>
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
+
+    <!-- About -->
+    <string name="about_title">Hakkında</string>
+    <string name="about_version">Sürüm %1$s</string>
+    <string name="about_source_code">Kaynak kod</string>
+    <string name="about_copyright">© 2026 Bayram Apuhan</string>
 
     <!-- Common -->
     <string name="confirm_delete_title">Silmeyi onayla</string>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PhoneCleaner</string>
+
+    <!-- Home -->
+    <string name="home_title">My Phone</string>
+    <string name="home_subtitle">Keep your device clean and fast</string>
+    <string name="feature_storage">Storage Analysis</string>
+    <string name="feature_storage_desc">See what takes up space</string>
+    <string name="feature_large_files">Large Files</string>
+    <string name="feature_large_files_desc">Find and delete bulky files</string>
+    <string name="feature_apps">App Manager</string>
+    <string name="feature_apps_desc">Manage installed apps</string>
+    <string name="feature_apk">APK Cleaner</string>
+    <string name="feature_apk_desc">Remove leftover APK files</string>
+
+    <!-- Permissions -->
+    <string name="perm_required_title">Permission required</string>
+    <string name="perm_storage_msg">This feature needs storage access permission.</string>
+    <string name="perm_all_files_msg">Grant all-files access from Settings to use this feature.</string>
+    <string name="perm_grant">Grant</string>
+    <string name="perm_open_settings">Open Settings</string>
+
+    <!-- Storage -->
+    <string name="storage_title">Storage</string>
+    <string name="storage_used">Used</string>
+    <string name="storage_free">Free</string>
+    <string name="storage_total">total</string>
+    <string name="storage_category_images">Photos</string>
+    <string name="storage_category_videos">Videos</string>
+    <string name="storage_category_audio">Audio</string>
+    <string name="storage_category_apps">Apps</string>
+    <string name="storage_category_other">Other</string>
+
+    <!-- Large files -->
+    <string name="large_files_title">Large Files</string>
+    <string name="large_files_threshold">Threshold: %1$s</string>
+    <string name="large_files_empty">No files above the threshold.</string>
+    <string name="large_files_scanning">Scanning…</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_select_all">Select all</string>
+    <string name="action_clear_selection">Clear</string>
+
+    <!-- Apps -->
+    <string name="apps_title">Apps</string>
+    <string name="apps_sort_size">By size</string>
+    <string name="apps_sort_name">By name</string>
+    <string name="apps_uninstall">Uninstall</string>
+    <string name="apps_loading">Loading apps…</string>
+
+    <!-- APK -->
+    <string name="apk_title">APK Cleaner</string>
+    <string name="apk_empty">No APK files found.</string>
+    <string name="apk_scanning">Scanning APKs…</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_scanning">Scanning</string>
+    <string name="settings_large_threshold">Large file threshold</string>
+    <string name="settings_hide_system">Hide system apps</string>
+    <string name="settings_about">About</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_source_code">Source code</string>
+    <string name="about_copyright">© 2026 Bayram Apuhan</string>
+
+    <!-- Common -->
+    <string name="confirm_delete_title">Confirm deletion</string>
+    <string name="confirm_delete_body">%1$d items (%2$s) will be permanently deleted. This cannot be undone.</string>
+    <string name="snackbar_deleted">%1$d files deleted · %2$s freed</string>
+    <string name="snackbar_delete_failed">Delete failed</string>
+    <string name="search_placeholder">Search…</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+</resources>

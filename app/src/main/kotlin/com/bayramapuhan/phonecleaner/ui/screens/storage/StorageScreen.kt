@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,17 +60,20 @@ fun StorageScreen(
             )
         },
     ) { padding ->
-        Box(
+        PullToRefreshBox(
+            isRefreshing = state.loading,
+            onRefresh = { vm.refresh() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
             when {
-                state.loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                state.error != null -> Text(
-                    "Hata: ${state.error}",
-                    modifier = Modifier.align(Alignment.Center),
-                )
+                state.loading && state.info == null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+                state.error != null && state.info == null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Hata: ${state.error}")
+                }
                 state.info != null -> StorageContent(state.info!!)
             }
         }
