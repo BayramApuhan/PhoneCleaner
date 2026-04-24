@@ -54,7 +54,11 @@
     <string name="apk_scanning">APK\'lar taranıyor…</string>
 
     <!-- Common -->
-    <string name="confirm_delete">%1$d öğeyi silmek istediğine emin misin?</string>
+    <string name="confirm_delete_title">Silmeyi onayla</string>
+    <string name="confirm_delete_body">%1$d öğe (%2$s) kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
+    <string name="snackbar_deleted">%1$d dosya silindi · %2$s kazanıldı</string>
+    <string name="snackbar_delete_failed">Silme başarısız oldu</string>
+    <string name="search_placeholder">Ara…</string>
     <string name="cancel">İptal</string>
     <string name="ok">Tamam</string>
 </resources>

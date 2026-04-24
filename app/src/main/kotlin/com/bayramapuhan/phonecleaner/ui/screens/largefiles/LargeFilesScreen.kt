@@ -1,5 +1,6 @@
 package com.bayramapuhan.phonecleaner.ui.screens.largefiles
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +15,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,13 +28,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
+import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
@@ -50,9 +60,37 @@ fun LargeFilesScreen(
 ) {
     val state by vm.state.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showConfirm by remember { mutableStateOf(false) }
+
+    val deletedMsg = stringResource(R.string.snackbar_deleted)
+    val failedMsg = stringResource(R.string.snackbar_delete_failed)
 
     LaunchedEffect(Unit) {
         if (Permissions.hasAllFilesAccess()) vm.scan()
+    }
+
+    LaunchedEffect(Unit) {
+        vm.events.collect { event ->
+            when (event) {
+                is LargeFilesEvent.Deleted -> snackbarHostState.showSnackbar(
+                    deletedMsg.format(event.result.deletedCount, event.result.bytesFreed.formatSize()),
+                )
+                LargeFilesEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
+            }
+        }
+    }
+
+    if (showConfirm && state.selected.isNotEmpty()) {
+        ConfirmDeleteDialog(
+            count = state.selected.size,
+            totalBytes = state.selectedTotalBytes,
+            onConfirm = {
+                showConfirm = false
+                vm.deleteSelected()
+            },
+            onDismiss = { showConfirm = false },
+        )
     }
 
     Scaffold(
@@ -71,6 +109,7 @@ fun LargeFilesScreen(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -89,6 +128,24 @@ fun LargeFilesScreen(
             )
             Spacer(Modifier.height(8.dp))
 
+            OutlinedTextField(
+                value = state.query,
+                onValueChange = vm::setQuery,
+                placeholder = { Text(stringResource(R.string.search_placeholder)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = if (state.query.isNotEmpty()) {
+                    {
+                        IconButton(onClick = { vm.setQuery("") }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
+                    }
+                } else null,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(Modifier.height(8.dp))
+
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { vm.selectAll() }, modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.action_select_all))
@@ -101,19 +158,20 @@ fun LargeFilesScreen(
             Spacer(Modifier.height(8.dp))
 
             when {
-                state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.loading -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(8.dp))
                         Text(stringResource(R.string.large_files_scanning))
                     }
                 }
-                state.files.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.visibleFiles.isEmpty() -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(stringResource(R.string.large_files_empty))
                 }
                 else -> LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(state.files, key = { it.path }) { file ->
+                    items(state.visibleFiles, key = { it.path }) { file ->
                         ListItem(
+                            modifier = Modifier.clickable { vm.toggleSelect(file.path) },
                             headlineContent = { Text(file.name) },
                             supportingContent = { Text(file.path, maxLines = 1) },
                             trailingContent = {
@@ -133,14 +191,14 @@ fun LargeFilesScreen(
 
             if (state.selected.isNotEmpty()) {
                 Button(
-                    onClick = { vm.deleteSelected() },
+                    onClick = { showConfirm = true },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("${stringResource(R.string.action_delete)} (${state.selected.size})")
+                    Text("${stringResource(R.string.action_delete)} (${state.selected.size} · ${state.selectedTotalBytes.formatSize()})")
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.bayramapuhan.phonecleaner.ui.screens.apk
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,12 +24,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
+import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
@@ -47,9 +54,37 @@ fun ApkScreen(
 ) {
     val state by vm.state.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showConfirm by remember { mutableStateOf(false) }
+
+    val deletedMsg = stringResource(R.string.snackbar_deleted)
+    val failedMsg = stringResource(R.string.snackbar_delete_failed)
 
     LaunchedEffect(Unit) {
         if (Permissions.hasAllFilesAccess()) vm.scan()
+    }
+
+    LaunchedEffect(Unit) {
+        vm.events.collect { event ->
+            when (event) {
+                is ApkEvent.Deleted -> snackbarHostState.showSnackbar(
+                    deletedMsg.format(event.result.deletedCount, event.result.bytesFreed.formatSize()),
+                )
+                ApkEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
+            }
+        }
+    }
+
+    if (showConfirm && state.selected.isNotEmpty()) {
+        ConfirmDeleteDialog(
+            count = state.selected.size,
+            totalBytes = state.selectedTotalBytes,
+            onConfirm = {
+                showConfirm = false
+                vm.deleteSelected()
+            },
+            onDismiss = { showConfirm = false },
+        )
     }
 
     Scaffold(
@@ -68,6 +103,7 @@ fun ApkScreen(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -92,19 +128,20 @@ fun ApkScreen(
             }
 
             when {
-                state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.loading -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(8.dp))
                         Text(stringResource(R.string.apk_scanning))
                     }
                 }
-                state.files.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.files.isEmpty() -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(stringResource(R.string.apk_empty))
                 }
                 else -> LazyColumn(modifier = Modifier.weight(1f)) {
                     items(state.files, key = { it.path }) { file ->
                         ListItem(
+                            modifier = Modifier.clickable { vm.toggleSelect(file.path) },
                             headlineContent = { Text(file.name) },
                             supportingContent = { Text(file.path, maxLines = 1) },
                             trailingContent = {
@@ -124,14 +161,14 @@ fun ApkScreen(
 
             if (state.selected.isNotEmpty()) {
                 Button(
-                    onClick = { vm.deleteSelected() },
+                    onClick = { showConfirm = true },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("${stringResource(R.string.action_delete)} (${state.selected.size})")
+                    Text("${stringResource(R.string.action_delete)} (${state.selected.size} · ${state.selectedTotalBytes.formatSize()})")
                 }
             }
         }

@@ -18,7 +18,15 @@ data class AppsUiState(
     val loading: Boolean = false,
     val apps: List<AppItem> = emptyList(),
     val sort: AppSort = AppSort.SIZE,
-)
+    val query: String = "",
+) {
+    val visibleApps: List<AppItem>
+        get() = if (query.isBlank()) apps
+        else apps.filter {
+            it.label.contains(query, ignoreCase = true) ||
+                it.packageName.contains(query, ignoreCase = true)
+        }
+}
 
 @HiltViewModel
 class AppsViewModel @Inject constructor(
@@ -40,6 +48,8 @@ class AppsViewModel @Inject constructor(
     fun setSort(sort: AppSort) {
         _state.update { it.copy(sort = sort, apps = sorted(it.apps, sort)) }
     }
+
+    fun setQuery(q: String) = _state.update { it.copy(query = q) }
 
     fun uninstall(packageName: String) {
         repo.launchUninstall(packageName)

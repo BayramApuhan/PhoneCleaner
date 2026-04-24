@@ -2,6 +2,7 @@ package com.bayramapuhan.phonecleaner.data.repository
 
 import android.content.Context
 import android.os.Environment
+import com.bayramapuhan.phonecleaner.domain.model.DeleteResult
 import com.bayramapuhan.phonecleaner.domain.model.FileItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +29,18 @@ class FileRepository @Inject constructor(
         results.sortedByDescending { it.sizeBytes }
     }
 
-    suspend fun delete(paths: List<String>): Int = withContext(Dispatchers.IO) {
-        paths.count { runCatching { File(it).delete() }.getOrDefault(false) }
+    suspend fun delete(paths: List<String>): DeleteResult = withContext(Dispatchers.IO) {
+        var count = 0
+        var bytes = 0L
+        paths.forEach { path ->
+            val file = File(path)
+            val size = runCatching { file.length() }.getOrDefault(0L)
+            if (runCatching { file.delete() }.getOrDefault(false)) {
+                count++
+                bytes += size
+            }
+        }
+        DeleteResult(count, bytes)
     }
 
     private fun walk(dir: File, threshold: Long, out: MutableList<FileItem>, depthLimit: Int) {
