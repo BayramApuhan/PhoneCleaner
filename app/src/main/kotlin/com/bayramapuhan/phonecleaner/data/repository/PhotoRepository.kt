@@ -20,32 +20,36 @@ class PhotoRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
-    suspend fun loadAllPhotos(): List<Photo> = withContext(Dispatchers.IO) {
+    suspend fun loadAllPhotos(): List<Photo> = loadFromCollection(MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+    suspend fun loadAllVideos(): List<Photo> = loadFromCollection(MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+    suspend fun loadAllAudio(): List<Photo> = loadFromCollection(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+
+    private suspend fun loadFromCollection(collection: Uri): List<Photo> = withContext(Dispatchers.IO) {
         val list = mutableListOf<Photo>()
         val projection = arrayOf(
-            MediaStore.Images.Media._ID,
-            MediaStore.Images.Media.DISPLAY_NAME,
-            MediaStore.Images.Media.SIZE,
-            MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.MediaColumns._ID,
+            MediaStore.MediaColumns.DISPLAY_NAME,
+            MediaStore.MediaColumns.SIZE,
+            MediaStore.MediaColumns.DATE_ADDED,
         )
         runCatching {
             context.contentResolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                collection,
                 projection,
                 null,
                 null,
-                "${MediaStore.Images.Media.DATE_ADDED} DESC",
+                "${MediaStore.MediaColumns.DATE_ADDED} DESC",
             )
         }.getOrNull()?.use { c ->
-            val idCol = c.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
-            val nameCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-            val sizeCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
-            val dateCol = c.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+            val idCol = c.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
+            val nameCol = c.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+            val sizeCol = c.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)
+            val dateCol = c.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED)
             while (c.moveToNext()) {
                 val id = c.getLong(idCol)
                 list += Photo(
                     id = id,
-                    uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id),
+                    uri = ContentUris.withAppendedId(collection, id),
                     displayName = c.getString(nameCol) ?: "",
                     sizeBytes = c.getLong(sizeCol),
                     dateAdded = c.getLong(dateCol),

@@ -1,15 +1,20 @@
 package com.bayramapuhan.phonecleaner.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.bayramapuhan.phonecleaner.domain.model.CategoryType
 import com.bayramapuhan.phonecleaner.ui.screens.about.AboutScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apk.ApkScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apps.AppsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.home.HomeScreen
 import com.bayramapuhan.phonecleaner.ui.screens.largefiles.LargeFilesScreen
+import com.bayramapuhan.phonecleaner.ui.screens.medialist.MediaListScreen
 import com.bayramapuhan.phonecleaner.ui.screens.memory.MemoryScreen
+import com.bayramapuhan.phonecleaner.ui.screens.other.OtherFilesScreen
 import com.bayramapuhan.phonecleaner.ui.screens.photos.PhotosScreen
 import com.bayramapuhan.phonecleaner.ui.screens.settings.SettingsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.storage.StorageScreen
@@ -18,12 +23,16 @@ object Routes {
     const val HOME = "home"
     const val STORAGE = "storage"
     const val PHOTOS = "photos"
+    const val MEDIA = "media/{type}"
     const val LARGE_FILES = "large_files"
     const val APPS = "apps"
     const val APK = "apk"
+    const val OTHER = "other"
     const val MEMORY = "memory"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+
+    fun mediaRoute(type: String) = "media/$type"
 }
 
 @Composable
@@ -41,11 +50,31 @@ fun AppNavGraph() {
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
             )
         }
-        composable(Routes.STORAGE) { StorageScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.STORAGE) {
+            StorageScreen(
+                onBack = { nav.popBackStack() },
+                onOpenCategory = { type ->
+                    when (type) {
+                        CategoryType.IMAGES -> nav.navigate(Routes.PHOTOS)
+                        CategoryType.VIDEOS -> nav.navigate(Routes.mediaRoute("videos"))
+                        CategoryType.AUDIO -> nav.navigate(Routes.mediaRoute("audio"))
+                        CategoryType.APPS -> nav.navigate(Routes.APPS)
+                        CategoryType.OTHER -> nav.navigate(Routes.OTHER)
+                    }
+                },
+            )
+        }
         composable(Routes.PHOTOS) { PhotosScreen(onBack = { nav.popBackStack() }) }
+        composable(
+            route = Routes.MEDIA,
+            arguments = listOf(navArgument("type") { type = NavType.StringType }),
+        ) {
+            MediaListScreen(onBack = { nav.popBackStack() })
+        }
         composable(Routes.LARGE_FILES) { LargeFilesScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APPS) { AppsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APK) { ApkScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.OTHER) { OtherFilesScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.MEMORY) { MemoryScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.SETTINGS) {
             SettingsScreen(

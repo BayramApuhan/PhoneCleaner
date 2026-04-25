@@ -61,6 +61,15 @@
     <string name="apk_empty">No APK files found.</string>
     <string name="apk_scanning">Scanning APKs…</string>
 
+    <!-- Other files -->
+    <string name="other_files_title">Other Files</string>
+    <string name="other_files_empty">No other files found.</string>
+
+    <!-- Media list (videos / audio) -->
+    <string name="medialist_videos_title">Videos</string>
+    <string name="medialist_audio_title">Audio</string>
+    <string name="medialist_empty">No items found.</string>
+
     <!-- Photos -->
     <string name="photos_title">Photos</string>
     <string name="photos_tab_all">All</string>

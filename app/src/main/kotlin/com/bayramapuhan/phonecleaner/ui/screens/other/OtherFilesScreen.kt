@@ -1,4 +1,4 @@
-package com.bayramapuhan.phonecleaner.ui.screens.largefiles
+package com.bayramapuhan.phonecleaner.ui.screens.other
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,9 +56,9 @@ import com.bayramapuhan.phonecleaner.util.formatSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LargeFilesScreen(
+fun OtherFilesScreen(
     onBack: () -> Unit,
-    vm: LargeFilesViewModel = hiltViewModel(),
+    vm: OtherFilesViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsState()
     val context = LocalContext.current
@@ -75,10 +75,10 @@ fun LargeFilesScreen(
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
             when (event) {
-                is LargeFilesEvent.Deleted -> snackbarHostState.showSnackbar(
+                is OtherFilesEvent.Deleted -> snackbarHostState.showSnackbar(
                     deletedMsg.format(event.result.deletedCount, event.result.bytesFreed.formatSize()),
                 )
-                LargeFilesEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
+                OtherFilesEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
             }
         }
     }
@@ -98,7 +98,7 @@ fun LargeFilesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.large_files_title)) },
+                title = { Text(stringResource(R.string.other_files_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -120,15 +120,20 @@ fun LargeFilesScreen(
                 .padding(horizontal = 16.dp),
         ) {
             if (!Permissions.hasAllFilesAccess()) {
-                PermissionPrompt(onGrant = { Permissions.openAllFilesAccessSettings(context) })
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(top = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(stringResource(R.string.perm_required_title), style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(8.dp))
+                    Text(stringResource(R.string.perm_all_files_msg))
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = { Permissions.openAllFilesAccessSettings(context) }) {
+                        Text(stringResource(R.string.perm_open_settings))
+                    }
+                }
                 return@Scaffold
             }
-
-            Text(
-                stringResource(R.string.large_files_threshold, "${state.thresholdMb} MB"),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(Modifier.height(8.dp))
 
             OutlinedTextField(
                 value = state.query,
@@ -143,7 +148,7 @@ fun LargeFilesScreen(
                     }
                 } else null,
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
 
             Spacer(Modifier.height(8.dp))
@@ -159,36 +164,34 @@ fun LargeFilesScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            when {
-                state.loading -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier.weight(1f)) {
+                when {
+                    state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
-                        Spacer(Modifier.height(8.dp))
-                        Text(stringResource(R.string.large_files_scanning))
                     }
-                }
-                state.visibleFiles.isEmpty() -> Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(stringResource(R.string.large_files_empty))
-                }
-                else -> LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(state.visibleFiles, key = { it.path }) { file ->
-                        ListItem(
-                            modifier = Modifier.clickable { vm.toggleSelect(file.path) },
-                            leadingContent = {
-                                FileLeadingIcon(
-                                    path = file.path,
-                                    modifier = Modifier.size(48.dp),
-                                )
-                            },
-                            headlineContent = { Text(file.name, maxLines = 1) },
-                            supportingContent = { Text(file.sizeBytes.formatSize()) },
-                            trailingContent = {
-                                Checkbox(
-                                    checked = state.selected.contains(file.path),
-                                    onCheckedChange = { vm.toggleSelect(file.path) },
-                                )
-                            },
-                        )
+                    state.visibleFiles.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.other_files_empty))
+                    }
+                    else -> LazyColumn {
+                        items(state.visibleFiles, key = { it.path }) { file ->
+                            ListItem(
+                                modifier = Modifier.clickable { vm.toggleSelect(file.path) },
+                                leadingContent = {
+                                    FileLeadingIcon(
+                                        path = file.path,
+                                        modifier = Modifier.size(44.dp),
+                                    )
+                                },
+                                headlineContent = { Text(file.name, maxLines = 1) },
+                                supportingContent = { Text(file.sizeBytes.formatSize()) },
+                                trailingContent = {
+                                    Checkbox(
+                                        checked = state.selected.contains(file.path),
+                                        onCheckedChange = { vm.toggleSelect(file.path) },
+                                    )
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -206,19 +209,5 @@ fun LargeFilesScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun PermissionPrompt(onGrant: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(top = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(stringResource(R.string.perm_required_title), style = MaterialTheme.typography.titleMedium)
-        Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.perm_all_files_msg), style = MaterialTheme.typography.bodyMedium)
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = onGrant) { Text(stringResource(R.string.perm_open_settings)) }
     }
 }

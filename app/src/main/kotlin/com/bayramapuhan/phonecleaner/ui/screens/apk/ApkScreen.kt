@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.FileLeadingIcon
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
@@ -142,17 +143,19 @@ fun ApkScreen(
                     items(state.files, key = { it.path }) { file ->
                         ListItem(
                             modifier = Modifier.clickable { vm.toggleSelect(file.path) },
-                            headlineContent = { Text(file.name) },
-                            supportingContent = { Text(file.path, maxLines = 1) },
+                            leadingContent = {
+                                FileLeadingIcon(
+                                    path = file.path,
+                                    modifier = Modifier.size(48.dp),
+                                )
+                            },
+                            headlineContent = { Text(file.name, maxLines = 1) },
+                            supportingContent = { Text(file.sizeBytes.formatSize()) },
                             trailingContent = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(file.sizeBytes.formatSize())
-                                    Spacer(Modifier.width(8.dp))
-                                    Checkbox(
-                                        checked = state.selected.contains(file.path),
-                                        onCheckedChange = { vm.toggleSelect(file.path) },
-                                    )
-                                }
+                                Checkbox(
+                                    checked = state.selected.contains(file.path),
+                                    onCheckedChange = { vm.toggleSelect(file.path) },
+                                )
                             },
                         )
                     }

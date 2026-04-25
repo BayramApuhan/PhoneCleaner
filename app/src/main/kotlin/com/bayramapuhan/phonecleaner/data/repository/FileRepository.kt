@@ -29,6 +29,13 @@ class FileRepository @Inject constructor(
         results.sortedByDescending { it.sizeBytes }
     }
 
+    suspend fun findOtherFiles(): List<FileItem> = withContext(Dispatchers.IO) {
+        val root = Environment.getExternalStorageDirectory() ?: return@withContext emptyList()
+        val results = mutableListOf<FileItem>()
+        walkOther(root, results, depthLimit = 8)
+        results.sortedByDescending { it.sizeBytes }
+    }
+
     suspend fun delete(paths: List<String>): DeleteResult = withContext(Dispatchers.IO) {
         var count = 0
         var bytes = 0L
@@ -76,5 +83,34 @@ class FileRepository @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun walkOther(dir: File, out: MutableList<FileItem>, depthLimit: Int) {
+        if (depthLimit < 0) return
+        val children = dir.listFiles() ?: return
+        for (child in children) {
+            if (child.isDirectory) {
+                walkOther(child, out, depthLimit - 1)
+            } else {
+                val ext = child.extension.lowercase()
+                if (ext !in MEDIA_EXTENSIONS && child.length() > 0) {
+                    out += FileItem(
+                        path = child.absolutePath,
+                        name = child.name,
+                        sizeBytes = child.length(),
+                        lastModified = child.lastModified(),
+                    )
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val MEDIA_EXTENSIONS = setOf(
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "raw",
+            "mp4", "mkv", "avi", "mov", "webm", "3gp", "m4v",
+            "mp3", "wav", "m4a", "flac", "aac", "ogg", "opus", "wma",
+            "apk",
+        )
     }
 }

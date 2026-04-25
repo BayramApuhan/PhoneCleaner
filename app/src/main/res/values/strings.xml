@@ -61,6 +61,15 @@
     <string name="apk_empty">APK dosyası bulunamadı.</string>
     <string name="apk_scanning">APK\'lar taranıyor…</string>
 
+    <!-- Other files -->
+    <string name="other_files_title">Diğer Dosyalar</string>
+    <string name="other_files_empty">Diğer dosya bulunamadı.</string>
+
+    <!-- Media list (videos / audio) -->
+    <string name="medialist_videos_title">Videolar</string>
+    <string name="medialist_audio_title">Ses</string>
+    <string name="medialist_empty">Öğe bulunamadı.</string>
+
     <!-- Photos -->
     <string name="photos_title">Fotoğraflar</string>
     <string name="photos_tab_all">Tümü</string>

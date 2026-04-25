@@ -1,6 +1,7 @@
 package com.bayramapuhan.phonecleaner.ui.screens.storage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
+import com.bayramapuhan.phonecleaner.domain.model.CategoryType
 import com.bayramapuhan.phonecleaner.domain.model.StorageCategory
 import com.bayramapuhan.phonecleaner.domain.model.StorageInfo
 import com.bayramapuhan.phonecleaner.ui.components.DonutChart
@@ -54,6 +56,7 @@ import com.bayramapuhan.phonecleaner.util.formatSize
 @Composable
 fun StorageScreen(
     onBack: () -> Unit,
+    onOpenCategory: (CategoryType) -> Unit,
     vm: StorageViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsState()
@@ -82,14 +85,14 @@ fun StorageScreen(
                 state.error != null && state.info == null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Hata: ${state.error}")
                 }
-                state.info != null -> StorageContent(state.info!!)
+                state.info != null -> StorageContent(state.info!!, onOpenCategory)
             }
         }
     }
 }
 
 @Composable
-private fun StorageContent(info: StorageInfo) {
+private fun StorageContent(info: StorageInfo, onOpenCategory: (CategoryType) -> Unit) {
     val scroll = rememberScrollState()
     Column(
         modifier = Modifier
@@ -106,7 +109,7 @@ private fun StorageContent(info: StorageInfo) {
         )
         Spacer(Modifier.height(12.dp))
         info.categories.forEach { cat ->
-            CategoryRow(cat, info.totalBytes)
+            CategoryRow(cat, info.totalBytes, onClick = { onOpenCategory(cat.type) })
             Spacer(Modifier.height(10.dp))
         }
     }
@@ -186,12 +189,13 @@ private fun StatColumn(label: String, value: String) {
 }
 
 @Composable
-private fun CategoryRow(cat: StorageCategory, total: Long) {
+private fun CategoryRow(cat: StorageCategory, total: Long, onClick: () -> Unit) {
     val fraction = if (total > 0) cat.sizeBytes.toFloat() / total else 0f
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.surface)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
