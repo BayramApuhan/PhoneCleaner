@@ -11,9 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,17 +32,22 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
-import com.bayramapuhan.phonecleaner.domain.model.CategoryType
 import com.bayramapuhan.phonecleaner.domain.model.StorageCategory
 import com.bayramapuhan.phonecleaner.domain.model.StorageInfo
+import com.bayramapuhan.phonecleaner.ui.components.DonutChart
+import com.bayramapuhan.phonecleaner.ui.components.DonutSegment
+import com.bayramapuhan.phonecleaner.ui.components.color
+import com.bayramapuhan.phonecleaner.ui.components.label
 import com.bayramapuhan.phonecleaner.util.formatSize
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,9 +73,7 @@ fun StorageScreen(
         PullToRefreshBox(
             isRefreshing = state.loading,
             onRefresh = { vm.refresh() },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding),
         ) {
             when {
                 state.loading && state.info == null -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -82,54 +90,98 @@ fun StorageScreen(
 
 @Composable
 private fun StorageContent(info: StorageInfo) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-        SummaryCard(info)
-        Spacer(Modifier.height(24.dp))
+    val scroll = rememberScrollState()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scroll)
+            .padding(16.dp),
+    ) {
+        DonutSummaryCard(info)
+        Spacer(Modifier.height(20.dp))
         Text(
-            "Kategoriler",
+            stringResource(R.string.storage_categories_label),
             style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 4.dp),
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
         info.categories.forEach { cat ->
             CategoryRow(cat, info.totalBytes)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(10.dp))
         }
     }
 }
 
 @Composable
-private fun SummaryCard(info: StorageInfo) {
+private fun DonutSummaryCard(info: StorageInfo) {
     val usedFraction = if (info.totalBytes > 0) info.usedBytes.toFloat() / info.totalBytes else 0f
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
-            .padding(20.dp),
+    val percent = (usedFraction * 100).toInt()
+    val segments = remember(info) {
+        info.categories.map { DonutSegment(it.sizeBytes.toFloat(), it.type.color()) } +
+            DonutSegment(info.freeBytes.toFloat(), androidx.compose.ui.graphics.Color(0xFF334155))
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            DonutChart(
+                segments = segments,
+                modifier = Modifier.size(220.dp),
+                strokeWidth = 28.dp,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "$percent%",
+                        style = MaterialTheme.typography.displayMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        stringResource(R.string.storage_used),
+                        style = MaterialTheme.typography.labelMedium,
+                        letterSpacing = 1.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                StatColumn(
+                    label = stringResource(R.string.storage_used),
+                    value = info.usedBytes.formatSize(),
+                )
+                StatColumn(
+                    label = stringResource(R.string.storage_free),
+                    value = info.freeBytes.formatSize(),
+                )
+                StatColumn(
+                    label = stringResource(R.string.storage_total),
+                    value = info.totalBytes.formatSize(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatColumn(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Text(
-            info.usedBytes.formatSize(),
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            "${stringResource(R.string.storage_used)} / ${info.totalBytes.formatSize()} ${stringResource(R.string.storage_total).lowercase()}",
+            label,
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(12.dp))
-        LinearProgressIndicator(
-            progress = { usedFraction },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp),
-        )
-        Spacer(Modifier.height(8.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("${stringResource(R.string.storage_free)}: ${info.freeBytes.formatSize()}", style = MaterialTheme.typography.labelMedium)
-            Text("${(usedFraction * 100).toInt()}%", style = MaterialTheme.typography.labelMedium)
-        }
     }
 }
 
@@ -137,47 +189,47 @@ private fun SummaryCard(info: StorageInfo) {
 private fun CategoryRow(cat: StorageCategory, total: Long) {
     val fraction = if (total > 0) cat.sizeBytes.toFloat() / total else 0f
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(12.dp)
-                .background(cat.type.color(), RoundedCornerShape(3.dp)),
-        )
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(cat.type.color().copy(alpha = 0.18f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(14.dp)
+                    .clip(CircleShape)
+                    .background(cat.type.color()),
+            )
+        }
         Spacer(Modifier.size(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(cat.type.label(), style = MaterialTheme.typography.bodyMedium)
-                Text(cat.sizeBytes.formatSize(), style = MaterialTheme.typography.labelMedium)
+                Text(cat.type.label(), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    cat.sizeBytes.formatSize(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
             LinearProgressIndicator(
                 progress = { fraction.coerceAtMost(1f) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(6.dp),
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp)),
                 color = cat.type.color(),
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         }
     }
-}
-
-@Composable
-private fun CategoryType.label(): String = stringResource(
-    when (this) {
-        CategoryType.IMAGES -> R.string.storage_category_images
-        CategoryType.VIDEOS -> R.string.storage_category_videos
-        CategoryType.AUDIO -> R.string.storage_category_audio
-        CategoryType.APPS -> R.string.storage_category_apps
-        CategoryType.OTHER -> R.string.storage_category_other
-    },
-)
-
-private fun CategoryType.color(): Color = when (this) {
-    CategoryType.IMAGES -> Color(0xFF06B6D4)
-    CategoryType.VIDEOS -> Color(0xFF8B5CF6)
-    CategoryType.AUDIO -> Color(0xFFF59E0B)
-    CategoryType.APPS -> Color(0xFF10B981)
-    CategoryType.OTHER -> Color(0xFF94A3B8)
 }

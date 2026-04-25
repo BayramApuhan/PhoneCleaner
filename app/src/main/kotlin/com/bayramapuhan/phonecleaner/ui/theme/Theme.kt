@@ -1,32 +1,54 @@
 package com.bayramapuhan.phonecleaner.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import com.bayramapuhan.phonecleaner.domain.model.ThemeMode
 
 private val LightColors = lightColorScheme(
-    primary = Cyan40,
-    secondary = Teal40,
-    tertiary = Amber40,
+    primary = PrimaryCyan,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryCyanLight,
+    onPrimaryContainer = Color(0xFF003544),
+    secondary = SecondaryAmber,
+    onSecondary = Color.Black,
+    tertiary = Color(0xFF8B5CF6),
+    background = LightBackground,
+    onBackground = Color(0xFF0F1419),
+    surface = LightSurface,
+    onSurface = Color(0xFF0F1419),
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = Color(0xFF475569),
+    error = ErrorRed,
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Cyan80,
-    secondary = Teal80,
-    tertiary = Amber80,
+    primary = PrimaryCyan,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF0E5266),
+    onPrimaryContainer = PrimaryCyanLight,
+    secondary = SecondaryAmber,
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF7C4A00),
+    onSecondaryContainer = Color(0xFFFFE0B0),
+    tertiary = Color(0xFFA78BFA),
+    background = DarkBackground,
+    onBackground = DarkOnSurface,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    error = ErrorRed,
+    errorContainer = Color(0xFF5A1212),
+    onErrorContainer = Color(0xFFFECACA),
 )
 
 @Composable
 fun PhoneCleanerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themeMode) {
@@ -34,16 +56,8 @@ fun PhoneCleanerTheme(
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val ctx = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(ctx) else dynamicLightColorScheme(ctx)
-        }
-        darkTheme -> DarkColors
-        else -> LightColors
-    }
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = AppTypography,
         content = content,
     )

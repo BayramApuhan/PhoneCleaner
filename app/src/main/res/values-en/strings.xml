@@ -5,6 +5,9 @@
     <!-- Home -->
     <string name="home_title">My Phone</string>
     <string name="home_subtitle">Keep your device clean and fast</string>
+    <string name="home_free_space">Free space</string>
+    <string name="home_total_space">Total %1$s</string>
+    <string name="home_quick_clean">Quick Clean</string>
     <string name="feature_storage">Storage</string>
     <string name="feature_storage_desc">See what takes up space</string>
     <string name="feature_photos">Photos</string>
@@ -35,6 +38,7 @@
     <string name="storage_category_audio">Audio</string>
     <string name="storage_category_apps">Apps</string>
     <string name="storage_category_other">Other</string>
+    <string name="storage_categories_label">Categories</string>
 
     <!-- Large files -->
     <string name="large_files_title">Large Files</string>

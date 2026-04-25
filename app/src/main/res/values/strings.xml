@@ -5,6 +5,9 @@
     <!-- Home -->
     <string name="home_title">Telefonum</string>
     <string name="home_subtitle">Cihazını temiz ve hızlı tut</string>
+    <string name="home_free_space">Boş alan</string>
+    <string name="home_total_space">Toplam %1$s</string>
+    <string name="home_quick_clean">Hızlı Temizle</string>
     <string name="feature_storage">Depolama</string>
     <string name="feature_storage_desc">Ne ne kadar yer kaplıyor</string>
     <string name="feature_photos">Fotoğraflar</string>
@@ -35,6 +38,7 @@
     <string name="storage_category_audio">Ses</string>
     <string name="storage_category_apps">Uygulamalar</string>
     <string name="storage_category_other">Diğer</string>
+    <string name="storage_categories_label">Kategoriler</string>
 
     <!-- Large files -->
     <string name="large_files_title">Büyük Dosyalar</string>
