@@ -5,14 +5,18 @@
     <!-- Home -->
     <string name="home_title">Telefonum</string>
     <string name="home_subtitle">Cihazını temiz ve hızlı tut</string>
-    <string name="feature_storage">Depolama Analizi</string>
-    <string name="feature_storage_desc">Hangi şey ne kadar yer kaplıyor</string>
+    <string name="feature_storage">Depolama</string>
+    <string name="feature_storage_desc">Ne ne kadar yer kaplıyor</string>
+    <string name="feature_photos">Fotoğraflar</string>
+    <string name="feature_photos_desc">Benzer fotoğrafları bul ve sil</string>
     <string name="feature_large_files">Büyük Dosyalar</string>
-    <string name="feature_large_files_desc">Yer kaplayan dosyaları bul ve sil</string>
-    <string name="feature_apps">Uygulama Yöneticisi</string>
+    <string name="feature_large_files_desc">Yer kaplayan dosyaları temizle</string>
+    <string name="feature_apps">Uygulamalar</string>
     <string name="feature_apps_desc">Kurulu uygulamaları yönet</string>
     <string name="feature_apk">APK Temizleyici</string>
     <string name="feature_apk_desc">Gereksiz APK dosyalarını temizle</string>
+    <string name="feature_memory">Bellek (RAM)</string>
+    <string name="feature_memory_desc">RAM kullanımı ve durum</string>
 
     <!-- Permissions -->
     <string name="perm_required_title">İzin gerekli</string>
@@ -52,6 +56,26 @@
     <string name="apk_title">APK Temizleyici</string>
     <string name="apk_empty">APK dosyası bulunamadı.</string>
     <string name="apk_scanning">APK\'lar taranıyor…</string>
+
+    <!-- Photos -->
+    <string name="photos_title">Fotoğraflar</string>
+    <string name="photos_tab_all">Tümü</string>
+    <string name="photos_tab_duplicates">Benzerler</string>
+    <string name="photos_loading">Fotoğraflar yükleniyor…</string>
+    <string name="photos_empty">Cihazda fotoğraf bulunamadı.</string>
+    <string name="photos_scanning_dupes">Benzer fotoğraflar taranıyor…</string>
+    <string name="photos_no_duplicates">Benzer fotoğraf bulunamadı 🎉</string>
+    <string name="photos_group_label">%1$d fotoğraf · %2$s</string>
+    <string name="photos_keep">Tutulacak</string>
+
+    <!-- Memory -->
+    <string name="memory_title">Bellek (RAM)</string>
+    <string name="memory_used">Kullanılan</string>
+    <string name="memory_free">Boş</string>
+    <string name="memory_low_warning">Düşük bellek durumu — sistem agresif şekilde uygulamaları sonlandırabilir.</string>
+    <string name="memory_disclaimer_title">Neden \"boost\" butonu yok?</string>
+    <string name="memory_disclaimer_body">Android 8+ otomatik olarak belleği yönetir. 3rd-party uygulamalar arka plan proseslerini kapatamaz. \"RAM boost\" butonları kozmetiktir; gerçek bir etkisi olmaz.</string>
+    <string name="memory_open_system">Sistem uygulama listesini aç</string>
 
     <!-- Settings -->
     <string name="settings_title">Ayarlar</string>

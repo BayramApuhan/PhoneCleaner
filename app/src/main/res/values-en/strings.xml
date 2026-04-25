@@ -5,14 +5,18 @@
     <!-- Home -->
     <string name="home_title">My Phone</string>
     <string name="home_subtitle">Keep your device clean and fast</string>
-    <string name="feature_storage">Storage Analysis</string>
+    <string name="feature_storage">Storage</string>
     <string name="feature_storage_desc">See what takes up space</string>
+    <string name="feature_photos">Photos</string>
+    <string name="feature_photos_desc">Find and delete duplicates</string>
     <string name="feature_large_files">Large Files</string>
-    <string name="feature_large_files_desc">Find and delete bulky files</string>
-    <string name="feature_apps">App Manager</string>
+    <string name="feature_large_files_desc">Clean up bulky files</string>
+    <string name="feature_apps">Apps</string>
     <string name="feature_apps_desc">Manage installed apps</string>
     <string name="feature_apk">APK Cleaner</string>
     <string name="feature_apk_desc">Remove leftover APK files</string>
+    <string name="feature_memory">Memory (RAM)</string>
+    <string name="feature_memory_desc">RAM usage and state</string>
 
     <!-- Permissions -->
     <string name="perm_required_title">Permission required</string>
@@ -52,6 +56,26 @@
     <string name="apk_title">APK Cleaner</string>
     <string name="apk_empty">No APK files found.</string>
     <string name="apk_scanning">Scanning APKs…</string>
+
+    <!-- Photos -->
+    <string name="photos_title">Photos</string>
+    <string name="photos_tab_all">All</string>
+    <string name="photos_tab_duplicates">Duplicates</string>
+    <string name="photos_loading">Loading photos…</string>
+    <string name="photos_empty">No photos found on device.</string>
+    <string name="photos_scanning_dupes">Scanning for duplicates…</string>
+    <string name="photos_no_duplicates">No duplicates found 🎉</string>
+    <string name="photos_group_label">%1$d photos · %2$s</string>
+    <string name="photos_keep">Keep</string>
+
+    <!-- Memory -->
+    <string name="memory_title">Memory (RAM)</string>
+    <string name="memory_used">Used</string>
+    <string name="memory_free">Free</string>
+    <string name="memory_low_warning">Low memory — system may aggressively kill apps.</string>
+    <string name="memory_disclaimer_title">Why no \"boost\" button?</string>
+    <string name="memory_disclaimer_body">Android 8+ manages memory automatically. Third-party apps cannot kill other processes. \"RAM boost\" buttons are cosmetic and do nothing useful.</string>
+    <string name="memory_open_system">Open system app list</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

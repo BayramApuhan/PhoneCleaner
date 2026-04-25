@@ -9,15 +9,19 @@ import com.bayramapuhan.phonecleaner.ui.screens.apk.ApkScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apps.AppsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.home.HomeScreen
 import com.bayramapuhan.phonecleaner.ui.screens.largefiles.LargeFilesScreen
+import com.bayramapuhan.phonecleaner.ui.screens.memory.MemoryScreen
+import com.bayramapuhan.phonecleaner.ui.screens.photos.PhotosScreen
 import com.bayramapuhan.phonecleaner.ui.screens.settings.SettingsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.storage.StorageScreen
 
 object Routes {
     const val HOME = "home"
     const val STORAGE = "storage"
+    const val PHOTOS = "photos"
     const val LARGE_FILES = "large_files"
     const val APPS = "apps"
     const val APK = "apk"
+    const val MEMORY = "memory"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
 }
@@ -29,16 +33,20 @@ fun AppNavGraph() {
         composable(Routes.HOME) {
             HomeScreen(
                 onOpenStorage = { nav.navigate(Routes.STORAGE) },
+                onOpenPhotos = { nav.navigate(Routes.PHOTOS) },
                 onOpenLargeFiles = { nav.navigate(Routes.LARGE_FILES) },
                 onOpenApps = { nav.navigate(Routes.APPS) },
                 onOpenApk = { nav.navigate(Routes.APK) },
+                onOpenMemory = { nav.navigate(Routes.MEMORY) },
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
             )
         }
         composable(Routes.STORAGE) { StorageScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.PHOTOS) { PhotosScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.LARGE_FILES) { LargeFilesScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APPS) { AppsScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.APK) { ApkScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.MEMORY) { MemoryScreen(onBack = { nav.popBackStack() }) }
         composable(Routes.SETTINGS) {
             SettingsScreen(
                 onBack = { nav.popBackStack() },

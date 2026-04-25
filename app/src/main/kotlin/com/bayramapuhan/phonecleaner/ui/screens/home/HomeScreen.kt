@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.FolderZip
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Card
@@ -44,6 +46,7 @@ private data class FeatureTile(
     val title: Int,
     val desc: Int,
     val icon: ImageVector,
+    val accent: Color,
     val onClick: () -> Unit,
 )
 
@@ -51,16 +54,20 @@ private data class FeatureTile(
 @Composable
 fun HomeScreen(
     onOpenStorage: () -> Unit,
+    onOpenPhotos: () -> Unit,
     onOpenLargeFiles: () -> Unit,
     onOpenApps: () -> Unit,
     onOpenApk: () -> Unit,
+    onOpenMemory: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val tiles = listOf(
-        FeatureTile(R.string.feature_storage, R.string.feature_storage_desc, Icons.Default.Storage, onOpenStorage),
-        FeatureTile(R.string.feature_large_files, R.string.feature_large_files_desc, Icons.Default.CleaningServices, onOpenLargeFiles),
-        FeatureTile(R.string.feature_apps, R.string.feature_apps_desc, Icons.Default.Apps, onOpenApps),
-        FeatureTile(R.string.feature_apk, R.string.feature_apk_desc, Icons.Default.FolderZip, onOpenApk),
+        FeatureTile(R.string.feature_storage, R.string.feature_storage_desc, Icons.Default.Storage, Color(0xFF0EA5E9), onOpenStorage),
+        FeatureTile(R.string.feature_photos, R.string.feature_photos_desc, Icons.Default.PhotoLibrary, Color(0xFFEC4899), onOpenPhotos),
+        FeatureTile(R.string.feature_large_files, R.string.feature_large_files_desc, Icons.Default.CleaningServices, Color(0xFFF97316), onOpenLargeFiles),
+        FeatureTile(R.string.feature_apps, R.string.feature_apps_desc, Icons.Default.Apps, Color(0xFF10B981), onOpenApps),
+        FeatureTile(R.string.feature_apk, R.string.feature_apk_desc, Icons.Default.FolderZip, Color(0xFF14B8A6), onOpenApk),
+        FeatureTile(R.string.feature_memory, R.string.feature_memory_desc, Icons.Default.Memory, Color(0xFF8B5CF6), onOpenMemory),
     )
 
     Scaffold(
@@ -111,7 +118,7 @@ private fun FeatureCard(tile: FeatureTile) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)),
+                    .background(tile.accent, RoundedCornerShape(14.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
