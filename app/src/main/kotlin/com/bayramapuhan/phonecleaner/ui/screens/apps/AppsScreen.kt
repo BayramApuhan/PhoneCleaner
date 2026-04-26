@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -138,27 +139,36 @@ fun AppsScreen(
             }
 
             when {
-                state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.loading && state.apps.isEmpty() -> Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(Modifier.height(8.dp))
                         Text(stringResource(R.string.apps_loading))
                     }
                 }
-                else -> LazyColumn {
-                    items(state.visibleApps, key = { it.packageName }) { app ->
-                        ListItem(
-                            leadingContent = {
-                                AppIcon(packageName = app.packageName, modifier = Modifier.size(40.dp))
-                            },
-                            headlineContent = { Text(app.label) },
-                            supportingContent = { Text("${app.packageName} · ${app.sizeBytes.formatSize()}") },
-                            trailingContent = {
-                                TextButton(onClick = { pendingUninstall = app }) {
-                                    Text(stringResource(R.string.apps_uninstall))
-                                }
-                            },
-                        )
+                else -> PullToRefreshBox(
+                    isRefreshing = state.loading,
+                    onRefresh = { vm.load() },
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(state.visibleApps, key = { it.packageName }) { app ->
+                            ListItem(
+                                leadingContent = {
+                                    AppIcon(packageName = app.packageName, modifier = Modifier.size(40.dp))
+                                },
+                                headlineContent = { Text(app.label) },
+                                supportingContent = { Text("${app.packageName} · ${app.sizeBytes.formatSize()}") },
+                                trailingContent = {
+                                    TextButton(onClick = { pendingUninstall = app }) {
+                                        Text(stringResource(R.string.apps_uninstall))
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
             }
