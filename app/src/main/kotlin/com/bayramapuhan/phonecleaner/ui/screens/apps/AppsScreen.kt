@@ -70,12 +70,13 @@ fun AppsScreen(
             confirmButton = {
                 TextButton(onClick = {
                     val pkg = app.packageName
-                    pendingUninstall = null
-                    val intent = Intent(
-                        Intent.ACTION_DELETE,
-                        Uri.parse("package:$pkg"),
-                    )
+                    @Suppress("DEPRECATION")
+                    val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply {
+                        data = Uri.parse("package:$pkg")
+                        putExtra(Intent.EXTRA_RETURN_RESULT, true)
+                    }
                     uninstallLauncher.launch(intent)
+                    pendingUninstall = null
                 }) { Text(stringResource(R.string.apps_uninstall)) }
             },
             dismissButton = {

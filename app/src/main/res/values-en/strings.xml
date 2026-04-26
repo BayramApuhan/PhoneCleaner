@@ -173,23 +173,33 @@
     <string name="notif_storage_low_body">Only %1$s left free. Want to clean up now?</string>
     <string name="notif_permission_denied">Notifications need permission from the system. Grant it from Settings.</string>
 
-    <!-- Quick clean hub -->
+    <!-- Quick clean (all-content grid) -->
     <string name="qc_title">Quick Clean</string>
-    <string name="qc_subtitle">Pick a category to free up space.</string>
-    <string name="qc_duplicates">Duplicate Photos</string>
-    <string name="qc_duplicates_desc">Find and remove repeats</string>
-    <string name="qc_large_files">Large Files</string>
-    <string name="qc_large_files_desc">Review the biggest files</string>
-    <string name="qc_apk">APK Files</string>
-    <string name="qc_apk_desc">Leftover install packages</string>
-    <string name="qc_apps">Apps</string>
-    <string name="qc_apps_desc">Uninstall what you don\'t use</string>
-    <string name="qc_photos">Photos</string>
-    <string name="qc_photos_desc">Browse your gallery</string>
-    <string name="qc_videos">Videos</string>
-    <string name="qc_videos_desc">Clean up old recordings</string>
-    <string name="qc_audio">Audio</string>
-    <string name="qc_audio_desc">Music and sound files</string>
+    <string name="qc_scanning">Scanning your phone…</string>
+    <string name="qc_empty">Nothing to clean up.</string>
+    <string name="qc_count_total">%1$d items · %2$s</string>
+    <string name="qc_delete_btn">Delete (%1$d · %2$s)</string>
+    <string name="qc_cat_photo">Photo</string>
+    <string name="qc_cat_video">Video</string>
+    <string name="qc_cat_audio">Audio</string>
+    <string name="qc_cat_apk">APK</string>
+    <string name="qc_cat_file">File</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Welcome to PhoneCleaner</string>
+    <string name="onboarding_subtitle">Before we can clean your phone we need a few permissions. You can change these from Settings any time.</string>
+    <string name="onboarding_media_title">Media files</string>
+    <string name="onboarding_media_body">Needed to scan your gallery, videos and audio.</string>
+    <string name="onboarding_allfiles_title">All-files access</string>
+    <string name="onboarding_allfiles_body">Needed to find large files, APKs and other content.</string>
+    <string name="onboarding_notif_title">Notifications</string>
+    <string name="onboarding_notif_body">For storage reminders when your phone fills up.</string>
+    <string name="onboarding_grant">Grant</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_skip">Skip for now</string>
+
+    <!-- Loading -->
+    <string name="deleting">Deleting…</string>
     <string name="recovery_email_title">Recovery email</string>
     <string name="recovery_email_hint">name@example.com</string>
     <string name="recovery_email_save">Save</string>

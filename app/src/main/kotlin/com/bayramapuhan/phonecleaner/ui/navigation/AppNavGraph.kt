@@ -73,16 +73,7 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.QUICK_CLEAN) {
-            QuickCleanScreen(
-                onBack = { nav.popBackStack() },
-                onOpenDuplicates = { nav.navigate(Routes.PHOTOS) },
-                onOpenLargeFiles = { nav.navigate(Routes.LARGE_FILES) },
-                onOpenApk = { nav.navigate(Routes.APK) },
-                onOpenApps = { nav.navigate(Routes.APPS) },
-                onOpenVideos = { nav.navigate(Routes.mediaRoute("videos")) },
-                onOpenAudio = { nav.navigate(Routes.mediaRoute("audio")) },
-                onOpenPhotos = { nav.navigate(Routes.PHOTOS) },
-            )
+            QuickCleanScreen(onBack = { nav.popBackStack() })
         }
         composable(Routes.STORAGE) {
             StorageScreen(

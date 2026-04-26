@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.DeletingOverlay
 import com.bayramapuhan.phonecleaner.ui.components.FileLeadingIcon
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
@@ -64,6 +65,7 @@ fun LargeFilesScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showConfirm by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf(false) }
 
     val deletedMsg = stringResource(R.string.snackbar_deleted)
     val failedMsg = stringResource(R.string.snackbar_delete_failed)
@@ -74,6 +76,7 @@ fun LargeFilesScreen(
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
+            deleting = false
             when (event) {
                 is LargeFilesEvent.Deleted -> snackbarHostState.showSnackbar(
                     deletedMsg.format(event.result.deletedCount, event.result.bytesFreed.formatSize()),
@@ -89,12 +92,14 @@ fun LargeFilesScreen(
             totalBytes = state.selectedTotalBytes,
             onConfirm = {
                 showConfirm = false
+                deleting = true
                 vm.deleteSelected()
             },
             onDismiss = { showConfirm = false },
         )
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -206,6 +211,8 @@ fun LargeFilesScreen(
                 }
             }
         }
+    }
+    DeletingOverlay(visible = deleting)
     }
 }
 

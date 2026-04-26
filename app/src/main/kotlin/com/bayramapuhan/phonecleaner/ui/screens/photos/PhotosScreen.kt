@@ -64,6 +64,7 @@ import coil.compose.AsyncImage
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.domain.model.Photo
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.DeletingOverlay
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
@@ -77,6 +78,7 @@ fun PhotosScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showConfirm by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf(false) }
     var hasPermission by remember { mutableStateOf(Permissions.hasMediaRead(context)) }
 
     val deletedMsg = stringResource(R.string.snackbar_deleted)
@@ -85,6 +87,7 @@ fun PhotosScreen(
     val deleteLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
+        deleting = false
         if (result.resultCode == Activity.RESULT_OK) vm.onDeletionConfirmed()
     }
 
@@ -105,8 +108,14 @@ fun PhotosScreen(
                 is PhotosEvent.LaunchDelete -> deleteLauncher.launch(
                     IntentSenderRequest.Builder(event.intentSender).build(),
                 )
-                PhotosEvent.DeletedDirectly -> snackbarHostState.showSnackbar(deletedMsg.format(0, "0 B"))
-                PhotosEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
+                PhotosEvent.DeletedDirectly -> {
+                    deleting = false
+                    snackbarHostState.showSnackbar(deletedMsg.format(0, "0 B"))
+                }
+                PhotosEvent.DeleteFailed -> {
+                    deleting = false
+                    snackbarHostState.showSnackbar(failedMsg)
+                }
             }
         }
     }
@@ -117,12 +126,14 @@ fun PhotosScreen(
             totalBytes = state.selectedTotalBytes,
             onConfirm = {
                 showConfirm = false
+                deleting = true
                 vm.deleteSelected()
             },
             onDismiss = { showConfirm = false },
         )
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -187,6 +198,8 @@ fun PhotosScreen(
                 }
             }
         }
+    }
+    DeletingOverlay(visible = deleting)
     }
 }
 

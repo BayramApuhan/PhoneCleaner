@@ -18,6 +18,8 @@ import com.bayramapuhan.phonecleaner.domain.model.ThemeMode
 import com.bayramapuhan.phonecleaner.ui.lock.LockScreen
 import com.bayramapuhan.phonecleaner.ui.lock.LockViewModel
 import com.bayramapuhan.phonecleaner.ui.navigation.AppNavGraph
+import com.bayramapuhan.phonecleaner.ui.onboarding.OnboardingScreen
+import com.bayramapuhan.phonecleaner.ui.onboarding.OnboardingViewModel
 import com.bayramapuhan.phonecleaner.ui.theme.PhoneCleanerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -40,20 +42,25 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-private fun AppRoot(vm: LockViewModel = hiltViewModel()) {
-    val state by vm.state.collectAsState()
+private fun AppRoot(
+    lockVm: LockViewModel = hiltViewModel(),
+    onboardingVm: OnboardingViewModel = hiltViewModel(),
+) {
+    val lockState by lockVm.state.collectAsState()
+    val onboardingDone by onboardingVm.completed.collectAsState()
     var unlocked by rememberSaveable { mutableStateOf(false) }
     var lockSnapshot by remember { mutableStateOf<Boolean?>(null) }
 
-    LaunchedEffect(state.initializing) {
-        if (!state.initializing && lockSnapshot == null) {
-            lockSnapshot = state.lockRequired
+    LaunchedEffect(lockState.initializing) {
+        if (!lockState.initializing && lockSnapshot == null) {
+            lockSnapshot = lockState.lockRequired
         }
     }
 
     when {
-        lockSnapshot == null -> Unit
+        lockSnapshot == null || onboardingDone == null -> Unit
         lockSnapshot == true && !unlocked -> LockScreen(onUnlocked = { unlocked = true })
+        onboardingDone == false -> OnboardingScreen(onComplete = { onboardingVm.complete() })
         else -> AppNavGraph()
     }
 }

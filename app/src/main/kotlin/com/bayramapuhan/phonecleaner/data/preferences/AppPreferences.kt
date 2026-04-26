@@ -29,6 +29,7 @@ class AppPreferences @Inject constructor(
         val PASSWORD_HASH = stringPreferencesKey("password_hash")
         val RECOVERY_EMAIL = stringPreferencesKey("recovery_email")
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
     val themeMode: Flow<ThemeMode> = context.dataStore.data.map { prefs ->
@@ -104,5 +105,13 @@ class AppPreferences @Inject constructor(
 
     suspend fun setBiometricEnabled(enabled: Boolean) {
         context.dataStore.edit { it[Keys.BIOMETRIC_ENABLED] = enabled }
+    }
+
+    val onboardingCompleted: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.ONBOARDING_COMPLETED] ?: false
+    }
+
+    suspend fun setOnboardingCompleted(done: Boolean) {
+        context.dataStore.edit { it[Keys.ONBOARDING_COMPLETED] = done }
     }
 }

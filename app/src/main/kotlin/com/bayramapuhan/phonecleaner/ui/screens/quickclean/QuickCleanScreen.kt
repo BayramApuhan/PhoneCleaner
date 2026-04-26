@@ -1,193 +1,314 @@
 package com.bayramapuhan.phonecleaner.ui.screens.quickclean
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Audiotrack
-import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.FolderZip
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
-
-private data class QuickCleanTile(
-    val titleRes: Int,
-    val descRes: Int,
-    val icon: ImageVector,
-    val accent: Color,
-    val onClick: () -> Unit,
-)
+import com.bayramapuhan.phonecleaner.domain.model.CleanableItem
+import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.DeletingOverlay
+import com.bayramapuhan.phonecleaner.ui.components.FileLeadingIcon
+import com.bayramapuhan.phonecleaner.ui.components.MediaThumb
+import com.bayramapuhan.phonecleaner.util.formatSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuickCleanScreen(
     onBack: () -> Unit,
-    onOpenDuplicates: () -> Unit,
-    onOpenLargeFiles: () -> Unit,
-    onOpenApk: () -> Unit,
-    onOpenApps: () -> Unit,
-    onOpenVideos: () -> Unit,
-    onOpenAudio: () -> Unit,
-    onOpenPhotos: () -> Unit,
+    vm: QuickCleanViewModel = hiltViewModel(),
 ) {
-    val tiles = listOf(
-        QuickCleanTile(
-            R.string.qc_duplicates,
-            R.string.qc_duplicates_desc,
-            Icons.Default.ContentCopy,
-            Color(0xFFEC4899),
-            onOpenDuplicates,
-        ),
-        QuickCleanTile(
-            R.string.qc_large_files,
-            R.string.qc_large_files_desc,
-            Icons.Default.CleaningServices,
-            Color(0xFFF97316),
-            onOpenLargeFiles,
-        ),
-        QuickCleanTile(
-            R.string.qc_apk,
-            R.string.qc_apk_desc,
-            Icons.Default.FolderZip,
-            Color(0xFF14B8A6),
-            onOpenApk,
-        ),
-        QuickCleanTile(
-            R.string.qc_apps,
-            R.string.qc_apps_desc,
-            Icons.Default.Apps,
-            Color(0xFF10B981),
-            onOpenApps,
-        ),
-        QuickCleanTile(
-            R.string.qc_photos,
-            R.string.qc_photos_desc,
-            Icons.Default.PhotoLibrary,
-            Color(0xFF06B6D4),
-            onOpenPhotos,
-        ),
-        QuickCleanTile(
-            R.string.qc_videos,
-            R.string.qc_videos_desc,
-            Icons.Default.Movie,
-            Color(0xFF8B5CF6),
-            onOpenVideos,
-        ),
-        QuickCleanTile(
-            R.string.qc_audio,
-            R.string.qc_audio_desc,
-            Icons.Default.Audiotrack,
-            Color(0xFFF59E0B),
-            onOpenAudio,
-        ),
-    )
+    val state by vm.state.collectAsState()
+    val snackbar = remember { SnackbarHostState() }
+    var showConfirm by remember { mutableStateOf(false) }
+    var pendingDiskAfterMedia by remember { mutableStateOf<List<String>>(emptyList()) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.qc_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+    val deletedFmt = stringResource(R.string.snackbar_deleted)
+    val failedMsg = stringResource(R.string.snackbar_delete_failed)
+
+    val mediaDeleteLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            vm.onMediaDeletionConfirmed(pendingDiskAfterMedia)
+        } else {
+            vm.onMediaDeletionCancelled()
+        }
+        pendingDiskAfterMedia = emptyList()
+    }
+
+    LaunchedEffect(Unit) { vm.load() }
+
+    LaunchedEffect(Unit) {
+        vm.events.collect { event ->
+            when (event) {
+                is QuickCleanEvent.LaunchMediaDelete -> {
+                    pendingDiskAfterMedia = event.pendingDiskPaths
+                    mediaDeleteLauncher.launch(IntentSenderRequest.Builder(event.intentSender).build())
+                }
+                is QuickCleanEvent.Deleted -> snackbar.showSnackbar(
+                    deletedFmt.format(event.count, event.freed.formatSize()),
+                )
+                QuickCleanEvent.DeleteFailed -> snackbar.showSnackbar(failedMsg)
+            }
+        }
+    }
+
+    if (showConfirm && state.selected.isNotEmpty()) {
+        ConfirmDeleteDialog(
+            count = state.selected.size,
+            totalBytes = state.selectedTotalBytes,
+            onConfirm = {
+                showConfirm = false
+                vm.deleteSelected()
+            },
+            onDismiss = { showConfirm = false },
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.qc_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        }
+                    },
+                )
+            },
+            snackbarHost = { SnackbarHost(snackbar) },
+        ) { padding ->
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                when {
+                    state.loading -> Box(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Spacer(Modifier.height(8.dp))
+                            Text(stringResource(R.string.qc_scanning))
+                        }
                     }
-                },
-            )
-        },
-    ) { padding ->
-        Column(
+                    state.items.isEmpty() -> Box(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(stringResource(R.string.qc_empty))
+                    }
+                    else -> {
+                        Text(
+                            stringResource(
+                                R.string.qc_count_total,
+                                state.items.size,
+                                state.items.sumOf { it.sizeBytes }.formatSize(),
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                        )
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3),
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                            contentPadding = PaddingValues(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(state.items, key = { it.key }) { item ->
+                                CleanableCell(
+                                    item = item,
+                                    selected = item.key in state.selected,
+                                    onClick = { vm.toggleSelect(item.key) },
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (state.selected.isNotEmpty()) {
+                    Button(
+                        onClick = { showConfirm = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            stringResource(
+                                R.string.qc_delete_btn,
+                                state.selected.size,
+                                state.selectedTotalBytes.formatSize(),
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        DeletingOverlay(visible = state.deleting)
+    }
+}
+
+@Composable
+private fun CleanableCell(
+    item: CleanableItem,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onClick),
+    ) {
+        when (item) {
+            is CleanableItem.Media -> {
+                MediaThumb(
+                    uri = item.uri,
+                    isVideo = item.category == CleanableItem.Category.VIDEO,
+                    modifier = Modifier.fillMaxSize(),
+                )
+                if (item.category == CleanableItem.Category.VIDEO) {
+                    Icon(
+                        Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .size(32.dp)
+                            .background(Color.Black.copy(alpha = 0.4f), CircleShape)
+                            .padding(4.dp),
+                    )
+                }
+            }
+            is CleanableItem.Disk -> {
+                FileLeadingIcon(path = item.path, modifier = Modifier.fillMaxSize())
+            }
+        }
+
+        // bottom info bar
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.Black.copy(alpha = 0.55f))
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                stringResource(R.string.qc_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                item.sizeBytes.formatSize(),
+                color = Color.White,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
             )
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize(),
+            Text(
+                item.category.label(),
+                color = Color.White.copy(alpha = 0.85f),
+                fontSize = 9.sp,
+            )
+        }
+
+        // selection indicator
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)),
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center,
             ) {
-                items(tiles) { tile -> QuickCleanCard(tile) }
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp),
+                )
             }
+        } else {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
+                    .size(22.dp)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.35f)),
+            )
         }
     }
 }
 
 @Composable
-private fun QuickCleanCard(tile: QuickCleanTile) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = tile.onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(tile.accent),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = tile.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Text(
-                stringResource(tile.titleRes),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                stringResource(tile.descRes),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
+private fun CleanableItem.Category.label(): String = stringResource(
+    when (this) {
+        CleanableItem.Category.PHOTO -> R.string.qc_cat_photo
+        CleanableItem.Category.VIDEO -> R.string.qc_cat_video
+        CleanableItem.Category.AUDIO -> R.string.qc_cat_audio
+        CleanableItem.Category.APK -> R.string.qc_cat_apk
+        CleanableItem.Category.LARGE_FILE -> R.string.qc_cat_file
+    },
+)

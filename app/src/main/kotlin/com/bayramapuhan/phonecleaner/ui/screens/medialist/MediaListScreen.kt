@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.DeletingOverlay
 import com.bayramapuhan.phonecleaner.ui.components.MediaThumb
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
@@ -71,6 +72,7 @@ fun MediaListScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showConfirm by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf(false) }
     var hasPermission by remember { mutableStateOf(Permissions.hasMediaRead(context)) }
 
     val deletedMsg = stringResource(R.string.snackbar_deleted)
@@ -79,6 +81,7 @@ fun MediaListScreen(
     val deleteLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
+        deleting = false
         if (result.resultCode == Activity.RESULT_OK) vm.onDeletionConfirmed()
     }
 
@@ -99,8 +102,14 @@ fun MediaListScreen(
                 is MediaListEvent.LaunchDelete -> deleteLauncher.launch(
                     IntentSenderRequest.Builder(event.intentSender).build(),
                 )
-                MediaListEvent.DeletedDirectly -> snackbarHostState.showSnackbar(deletedMsg.format(0, "0 B"))
-                MediaListEvent.DeleteFailed -> snackbarHostState.showSnackbar(failedMsg)
+                MediaListEvent.DeletedDirectly -> {
+                    deleting = false
+                    snackbarHostState.showSnackbar(deletedMsg.format(0, "0 B"))
+                }
+                MediaListEvent.DeleteFailed -> {
+                    deleting = false
+                    snackbarHostState.showSnackbar(failedMsg)
+                }
             }
         }
     }
@@ -111,6 +120,7 @@ fun MediaListScreen(
             totalBytes = state.selectedTotalBytes,
             onConfirm = {
                 showConfirm = false
+                deleting = true
                 vm.deleteSelected()
             },
             onDismiss = { showConfirm = false },
@@ -122,6 +132,7 @@ fun MediaListScreen(
         MediaListType.AUDIO -> R.string.medialist_audio_title
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -221,9 +232,6 @@ fun MediaListScreen(
             }
         }
     }
-}
-
-private fun typeColor(type: MediaListType): Color = when (type) {
-    MediaListType.VIDEOS -> Color(0xFF8B5CF6)
-    MediaListType.AUDIO -> Color(0xFFF59E0B)
+    DeletingOverlay(visible = deleting)
+    }
 }

@@ -173,23 +173,33 @@
     <string name="notif_storage_low_body">Yalnızca %1$s boş kaldı. Şimdi temizleyelim mi?</string>
     <string name="notif_permission_denied">Bildirim için sistemden izin gerekli. Ayarlar\'dan vermeyi unutmayın.</string>
 
-    <!-- Quick clean hub -->
+    <!-- Quick clean (all-content grid) -->
     <string name="qc_title">Hızlı Temizlik</string>
-    <string name="qc_subtitle">Yer kazanmak için bir kategori seç.</string>
-    <string name="qc_duplicates">Çift Fotoğraflar</string>
-    <string name="qc_duplicates_desc">Aynı kareleri bul, fazlasını sil</string>
-    <string name="qc_large_files">Büyük Dosyalar</string>
-    <string name="qc_large_files_desc">Yer kaplayanları gözden geçir</string>
-    <string name="qc_apk">APK Dosyaları</string>
-    <string name="qc_apk_desc">Yüklenen kurulum paketleri</string>
-    <string name="qc_apps">Uygulamalar</string>
-    <string name="qc_apps_desc">Az kullanılanları kaldır</string>
-    <string name="qc_photos">Fotoğraflar</string>
-    <string name="qc_photos_desc">Galerini gözden geçir</string>
-    <string name="qc_videos">Videolar</string>
-    <string name="qc_videos_desc">Eski kayıtları temizle</string>
-    <string name="qc_audio">Sesler</string>
-    <string name="qc_audio_desc">Müzik ve ses dosyaları</string>
+    <string name="qc_scanning">Telefonun taranıyor…</string>
+    <string name="qc_empty">Temizlenecek bir şey bulunamadı.</string>
+    <string name="qc_count_total">%1$d öğe · %2$s</string>
+    <string name="qc_delete_btn">Sil (%1$d · %2$s)</string>
+    <string name="qc_cat_photo">Foto</string>
+    <string name="qc_cat_video">Video</string>
+    <string name="qc_cat_audio">Ses</string>
+    <string name="qc_cat_apk">APK</string>
+    <string name="qc_cat_file">Dosya</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">PhoneCleaner\'a hoş geldin</string>
+    <string name="onboarding_subtitle">Telefonunu temizlemeye başlamadan önce birkaç izin gerekiyor. İstediğin anda Ayarlar\'dan değiştirebilirsin.</string>
+    <string name="onboarding_media_title">Medya dosyaları</string>
+    <string name="onboarding_media_body">Galerini, video ve ses dosyalarını taramak için.</string>
+    <string name="onboarding_allfiles_title">Tüm dosyalara erişim</string>
+    <string name="onboarding_allfiles_body">Büyük dosyaları, APK\'ları ve diğer içerikleri bulmak için.</string>
+    <string name="onboarding_notif_title">Bildirimler</string>
+    <string name="onboarding_notif_body">Depolama dolduğunda hatırlatıcı için.</string>
+    <string name="onboarding_grant">Ver</string>
+    <string name="onboarding_continue">Devam et</string>
+    <string name="onboarding_skip">Şimdilik atla</string>
+
+    <!-- Loading -->
+    <string name="deleting">Siliniyor…</string>
     <string name="recovery_email_title">Kurtarma E-postası</string>
     <string name="recovery_email_hint">ornek@adres.com</string>
     <string name="recovery_email_save">Kaydet</string>

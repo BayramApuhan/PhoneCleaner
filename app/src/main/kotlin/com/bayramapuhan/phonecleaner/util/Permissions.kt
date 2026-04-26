@@ -51,6 +51,13 @@ object Permissions {
         }
     }
 
+    fun hasNotifications(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            granted(context, Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            true
+        }
+
     private fun granted(context: Context, perm: String): Boolean =
         ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_GRANTED
 }
