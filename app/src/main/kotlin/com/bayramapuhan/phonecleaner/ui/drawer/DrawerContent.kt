@@ -1,5 +1,11 @@
 package com.bayramapuhan.phonecleaner.ui.drawer
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +56,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,6 +79,30 @@ fun DrawerContent(
     var restoreDialog by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
+    val deniedMsg = stringResource(R.string.notif_permission_denied)
+    val notifPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            vm.setNotifications(true)
+        } else {
+            Toast.makeText(context, deniedMsg, Toast.LENGTH_LONG).show()
+        }
+    }
+    val onToggleNotifications: (Boolean) -> Unit = { target ->
+        if (!target) {
+            vm.setNotifications(false)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) == PackageManager.PERMISSION_GRANTED
+            if (granted) vm.setNotifications(true)
+            else notifPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            vm.setNotifications(true)
+        }
+    }
 
     ModalDrawerSheet {
         Column(
@@ -90,7 +121,7 @@ fun DrawerContent(
                     icon = Icons.Default.Notifications,
                     label = stringResource(R.string.drawer_notifications),
                     checked = state.notificationsEnabled,
-                    onCheckedChange = vm::setNotifications,
+                    onCheckedChange = onToggleNotifications,
                 )
                 DrawerLinkRow(
                     icon = Icons.Default.Palette,

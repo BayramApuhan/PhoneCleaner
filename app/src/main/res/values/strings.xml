@@ -163,6 +163,13 @@
     <string name="lock_biometric_title">Kilidi parmak iziyle aç</string>
     <string name="lock_biometric_subtitle">PhoneCleaner kilitli. Devam etmek için kimliğini doğrula.</string>
     <string name="lock_wrong_password">Parola yanlış.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_cleanup">Temizlik hatırlatıcıları</string>
+    <string name="notif_channel_cleanup_desc">Depolama dolduğunda veya temizlenecek alan biriktiğinde bildirim göster.</string>
+    <string name="notif_storage_low_title">Depolama doluyor</string>
+    <string name="notif_storage_low_body">Yalnızca %1$s boş kaldı. Şimdi temizleyelim mi?</string>
+    <string name="notif_permission_denied">Bildirim için sistemden izin gerekli. Ayarlar\'dan vermeyi unutmayın.</string>
     <string name="recovery_email_title">Kurtarma E-postası</string>
     <string name="recovery_email_hint">ornek@adres.com</string>
     <string name="recovery_email_save">Kaydet</string>

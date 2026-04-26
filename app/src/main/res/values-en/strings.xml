@@ -163,6 +163,13 @@
     <string name="lock_biometric_title">Unlock with biometric</string>
     <string name="lock_biometric_subtitle">PhoneCleaner is locked. Authenticate to continue.</string>
     <string name="lock_wrong_password">Wrong password.</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_cleanup">Cleanup reminders</string>
+    <string name="notif_channel_cleanup_desc">Notify when storage is filling up or there\'s space to reclaim.</string>
+    <string name="notif_storage_low_title">Storage almost full</string>
+    <string name="notif_storage_low_body">Only %1$s left free. Want to clean up now?</string>
+    <string name="notif_permission_denied">Notifications need permission from the system. Grant it from Settings.</string>
     <string name="recovery_email_title">Recovery email</string>
     <string name="recovery_email_hint">name@example.com</string>
     <string name="recovery_email_save">Save</string>

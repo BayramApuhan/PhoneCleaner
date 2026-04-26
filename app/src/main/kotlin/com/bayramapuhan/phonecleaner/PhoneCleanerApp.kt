@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
+import com.bayramapuhan.phonecleaner.notifications.CleanupReminderWorker
+import com.bayramapuhan.phonecleaner.notifications.NotificationHelper
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -27,6 +29,14 @@ class PhoneCleanerApp : Application() {
             .appPreferences()
         val code = runBlocking { prefs.language.first() }
         applyLocale(code)
+
+        NotificationHelper.ensureChannels(this)
+        val notificationsOn = runBlocking { prefs.notificationsEnabled.first() }
+        if (notificationsOn) {
+            CleanupReminderWorker.schedule(this)
+        } else {
+            CleanupReminderWorker.cancel(this)
+        }
     }
 
     companion object {

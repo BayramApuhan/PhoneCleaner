@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)
+    implementation(libs.androidx.work.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

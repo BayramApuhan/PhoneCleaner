@@ -1,10 +1,13 @@
 package com.bayramapuhan.phonecleaner.ui.drawer
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.domain.model.ThemeMode
+import com.bayramapuhan.phonecleaner.notifications.CleanupReminderWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,6 +26,7 @@ data class DrawerUiState(
 
 @HiltViewModel
 class DrawerViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val prefs: AppPreferences,
 ) : ViewModel() {
     val state: StateFlow<DrawerUiState> = combine(
@@ -44,6 +48,11 @@ class DrawerViewModel @Inject constructor(
 
     fun setNotifications(enabled: Boolean) = viewModelScope.launch {
         prefs.setNotificationsEnabled(enabled)
+        if (enabled) {
+            CleanupReminderWorker.schedule(appContext)
+        } else {
+            CleanupReminderWorker.cancel(appContext)
+        }
     }
 
     fun setPasswordEnabled(enabled: Boolean) = viewModelScope.launch {
