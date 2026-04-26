@@ -19,6 +19,11 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
+    <!-- Required on Android 8+ so ACTION_UNINSTALL_PACKAGE / ACTION_DELETE
+         actually opens the system uninstall dialog. Normal-level permission,
+         no runtime prompt. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
     <!-- Biometric unlock for the in-app private space -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
