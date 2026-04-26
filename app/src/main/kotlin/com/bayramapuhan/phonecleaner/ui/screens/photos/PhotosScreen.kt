@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,10 +39,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -95,11 +93,11 @@ fun PhotosScreen(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { granted ->
         hasPermission = granted.values.all { it }
-        if (hasPermission) vm.loadPhotos()
+        if (hasPermission) vm.refresh()
     }
 
     LaunchedEffect(Unit) {
-        if (hasPermission) vm.loadPhotos()
+        if (hasPermission) vm.refresh()
     }
 
     LaunchedEffect(Unit) {
@@ -134,46 +132,37 @@ fun PhotosScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.photos_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                },
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-
-            if (!hasPermission) {
-                PermissionPrompt(onGrant = { permissionLauncher.launch(Permissions.mediaPermissions()) })
-                return@Scaffold
-            }
-
-            TabRow(selectedTabIndex = state.tab.ordinal) {
-                Tab(
-                    selected = state.tab == PhotosTab.ALL,
-                    onClick = { vm.selectTab(PhotosTab.ALL) },
-                    text = { Text("${stringResource(R.string.photos_tab_all)} (${state.photos.size})") },
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.photos_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        }
+                    },
                 )
-                Tab(
-                    selected = state.tab == PhotosTab.DUPLICATES,
-                    onClick = { vm.selectTab(PhotosTab.DUPLICATES) },
-                    text = { Text(stringResource(R.string.photos_tab_duplicates)) },
-                )
-            }
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+        ) { padding ->
+            Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                if (!hasPermission) {
+                    PermissionPrompt(onGrant = { permissionLauncher.launch(Permissions.mediaPermissions()) })
+                    return@Column
+                }
 
-            Box(modifier = Modifier.weight(1f)) {
-                when {
-                    state.loading -> CenteredLoading(stringResource(R.string.photos_loading))
-                    state.tab == PhotosTab.ALL -> AllPhotosGrid(state, onToggle = vm::toggleSelected)
-                    state.tab == PhotosTab.DUPLICATES -> when {
+                PullToRefreshBox(
+                    isRefreshing = state.loading || state.scanning,
+                    onRefresh = { vm.refresh() },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                ) {
+                    when {
+                        state.loading -> CenteredLoading(stringResource(R.string.photos_loading))
                         state.scanning -> ScanProgress(state.scanProgress, state.scanTotal)
-                        state.duplicateGroups.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        state.duplicateGroups.isEmpty() -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
                             Text(stringResource(R.string.photos_no_duplicates))
                         }
                         else -> DuplicatesList(
@@ -183,23 +172,22 @@ fun PhotosScreen(
                         )
                     }
                 }
-            }
 
-            if (state.selectedCount > 0) {
-                Button(
-                    onClick = { showConfirm = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("${stringResource(R.string.action_delete)} (${state.selectedCount} · ${state.selectedTotalBytes.formatSize()})")
+                if (state.selectedCount > 0) {
+                    Button(
+                        onClick = { showConfirm = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("${stringResource(R.string.action_delete)} (${state.selectedCount} · ${state.selectedTotalBytes.formatSize()})")
+                    }
                 }
             }
         }
-    }
-    DeletingOverlay(visible = deleting)
+        DeletingOverlay(visible = deleting)
     }
 }
 
@@ -226,30 +214,6 @@ private fun ScanProgress(current: Int, total: Int) {
             )
             Spacer(Modifier.height(8.dp))
             Text("$current / $total", style = MaterialTheme.typography.labelMedium)
-        }
-    }
-}
-
-@Composable
-private fun AllPhotosGrid(state: PhotosUiState, onToggle: (Long) -> Unit) {
-    if (state.photos.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.photos_empty))
-        }
-        return
-    }
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(2.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        items(state.photos, key = { it.id }) { photo ->
-            PhotoTile(
-                photo = photo,
-                selected = photo.id in state.selectedIds,
-                onClick = { onToggle(photo.id) },
-            )
         }
     }
 }

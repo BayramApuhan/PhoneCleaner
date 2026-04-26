@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -169,15 +170,19 @@ fun OtherFilesScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            Box(modifier = Modifier.weight(1f)) {
+            PullToRefreshBox(
+                isRefreshing = state.loading,
+                onRefresh = { vm.scan() },
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            ) {
                 when {
-                    state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    state.loading && state.files.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                     state.visibleFiles.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(stringResource(R.string.other_files_empty))
                     }
-                    else -> LazyColumn {
+                    else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(state.visibleFiles, key = { it.path }) { file ->
                             ListItem(
                                 modifier = Modifier.clickable { vm.toggleSelect(file.path) },

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bayramapuhan.phonecleaner.data.repository.PhotoRepository
 import com.bayramapuhan.phonecleaner.domain.model.Photo
+import com.bayramapuhan.phonecleaner.util.PhotoHash
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,20 +16,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class PhotosTab { ALL, DUPLICATES }
-
 data class PhotosUiState(
-    val tab: PhotosTab = PhotosTab.ALL,
     val loading: Boolean = false,
-    val photos: List<Photo> = emptyList(),
-    val selectedIds: Set<Long> = emptySet(),
     val scanning: Boolean = false,
     val scanProgress: Int = 0,
     val scanTotal: Int = 0,
     val duplicateGroups: List<List<Photo>> = emptyList(),
+    val selectedIds: Set<Long> = emptySet(),
 ) {
     val selectedTotalBytes: Long
-        get() = (photos + duplicateGroups.flatten())
+        get() = duplicateGroups.flatten()
             .distinctBy { it.id }
             .filter { it.id in selectedIds }
             .sumOf { it.sizeBytes }
@@ -53,37 +50,48 @@ class PhotosViewModel @Inject constructor(
     private val _events = Channel<PhotosEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
-    fun loadPhotos() {
+    /**
+     * One-shot pull-and-scan. Loads all photos, hashes them with the
+     * existing perceptual-hash util, then groups by Hamming distance.
+     * Algorithm: photos are pre-bucketed by file-size proximity (±10%)
+     * before hashing pairs, dropping the obvious O(n²) cost on the
+     * "everything against everything" hot loop. Within each bucket we
+     * still use a Hamming threshold of 8 (slightly stricter than the
+     * old 10) so near-identical edits stay grouped while genuinely
+     * different shots stay apart. Selection auto-checks every photo
+     * except the largest in each group — the safe default for
+     * "delete the duplicates, keep the best copy".
+     */
+    fun refresh() {
         viewModelScope.launch {
-            _state.update { it.copy(loading = true, selectedIds = emptySet(), duplicateGroups = emptyList()) }
+            _state.update {
+                it.copy(
+                    loading = true,
+                    selectedIds = emptySet(),
+                    duplicateGroups = emptyList(),
+                )
+            }
             val photos = runCatching { repo.loadAllPhotos() }.getOrDefault(emptyList())
-            _state.update { it.copy(loading = false, photos = photos) }
-        }
-    }
+            if (photos.isEmpty()) {
+                _state.update { it.copy(loading = false) }
+                return@launch
+            }
 
-    fun selectTab(tab: PhotosTab) {
-        _state.update { it.copy(tab = tab) }
-        if (tab == PhotosTab.DUPLICATES && _state.value.duplicateGroups.isEmpty() && !_state.value.scanning) {
-            findDuplicates()
-        }
-    }
+            _state.update {
+                it.copy(
+                    loading = false,
+                    scanning = true,
+                    scanProgress = 0,
+                    scanTotal = photos.size,
+                )
+            }
 
-    fun findDuplicates() {
-        viewModelScope.launch {
-            val photos = _state.value.photos
-            if (photos.isEmpty()) return@launch
-            _state.update { it.copy(scanning = true, scanProgress = 0, scanTotal = photos.size) }
             val hashes = repo.computeHashes(photos) { current, total ->
                 _state.update { it.copy(scanProgress = current, scanTotal = total) }
             }
-            val groupIds = repo.groupDuplicates(hashes)
-            val photoMap = photos.associateBy { it.id }
-            val groups = groupIds.mapNotNull { ids ->
-                ids.mapNotNull { photoMap[it] }
-                    .sortedByDescending { it.sizeBytes }
-                    .takeIf { it.size > 1 }
-            }
-            // Auto-suggest deletion: select all except largest in each group
+
+            val groups = bucketAndGroup(photos, hashes, hammingThreshold = 8)
+
             val autoSelected = groups.flatMap { it.drop(1).map { p -> p.id } }.toSet()
             _state.update {
                 it.copy(
@@ -109,19 +117,64 @@ class PhotosViewModel @Inject constructor(
         viewModelScope.launch {
             val ids = _state.value.selectedIds
             if (ids.isEmpty()) return@launch
-            val all = _state.value.photos + _state.value.duplicateGroups.flatten()
-            val uris = all.distinctBy { it.id }.filter { it.id in ids }.map { it.uri }
+            val uris = _state.value.duplicateGroups
+                .flatten()
+                .distinctBy { it.id }
+                .filter { it.id in ids }
+                .map { it.uri }
             val intentSender = runCatching { repo.deletePhotosIntent(uris) }.getOrNull()
             if (intentSender != null) {
                 _events.send(PhotosEvent.LaunchDelete(intentSender))
             } else {
                 _events.send(PhotosEvent.DeletedDirectly)
-                loadPhotos()
+                refresh()
             }
         }
     }
 
     fun onDeletionConfirmed() {
-        loadPhotos()
+        refresh()
+    }
+
+    /**
+     * Pre-bucket photos so we only run perceptual-hash comparisons inside
+     * size cohorts. Two photos whose byte sizes differ by more than ~10%
+     * are extremely unlikely to be perceptual duplicates of each other,
+     * and avoiding those pairs keeps the cost roughly linear in n on
+     * realistic galleries.
+     */
+    private fun bucketAndGroup(
+        photos: List<Photo>,
+        hashes: Map<Long, Long>,
+        hammingThreshold: Int,
+    ): List<List<Photo>> {
+        if (photos.isEmpty()) return emptyList()
+        val photoMap = photos.associateBy { it.id }
+        val sortedBySize = photos.filter { it.id in hashes }
+            .sortedBy { it.sizeBytes }
+        val visited = mutableSetOf<Long>()
+        val groups = mutableListOf<List<Photo>>()
+
+        for (anchor in sortedBySize) {
+            if (anchor.id in visited) continue
+            val anchorHash = hashes[anchor.id] ?: continue
+            val sizeWindow = (anchor.sizeBytes / 10).coerceAtLeast(64L * 1024L) // ±10% or 64 KiB
+            val groupIds = mutableListOf(anchor.id)
+            visited += anchor.id
+            for (other in sortedBySize) {
+                if (other.id in visited) continue
+                if (other.sizeBytes - anchor.sizeBytes > sizeWindow) break
+                val otherHash = hashes[other.id] ?: continue
+                if (PhotoHash.hammingDistance(anchorHash, otherHash) <= hammingThreshold) {
+                    groupIds += other.id
+                    visited += other.id
+                }
+            }
+            if (groupIds.size > 1) {
+                groups += groupIds.mapNotNull { photoMap[it] }
+                    .sortedByDescending { it.sizeBytes }
+            }
+        }
+        return groups
     }
 }

@@ -42,6 +42,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -148,22 +149,28 @@ fun HomeScreen(
             )
         },
     ) { padding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        PullToRefreshBox(
+            isRefreshing = state.loading,
+            onRefresh = { vm.refresh() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                HeroStorageCard(
-                    storage = state.storage,
-                    onQuickClean = onOpenQuickClean,
-                )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    HeroStorageCard(
+                        storage = state.storage,
+                        onQuickClean = onOpenQuickClean,
+                    )
+                }
+                items(tiles) { tile -> FeatureCard(tile) }
             }
-            items(tiles) { tile -> FeatureCard(tile) }
         }
     }
     }

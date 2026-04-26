@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 data class MemoryUiState(
     val info: MemoryInfo? = null,
+    val loading: Boolean = false,
 )
 
 @HiltViewModel
@@ -26,7 +27,9 @@ class MemoryViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            _state.value = MemoryUiState(info = repo.load())
+            _state.value = _state.value.copy(loading = true)
+            val info = repo.load()
+            _state.value = MemoryUiState(info = info, loading = false)
         }
     }
 

@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -163,9 +164,14 @@ fun QuickCleanScreen(
             snackbarHost = { SnackbarHost(snackbar) },
         ) { padding ->
             Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+                PullToRefreshBox(
+                    isRefreshing = state.loading,
+                    onRefresh = { vm.load() },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                ) {
                 when {
-                    state.loading -> Box(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                    state.loading && state.items.isEmpty() -> Box(
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -175,7 +181,7 @@ fun QuickCleanScreen(
                         }
                     }
                     state.items.isEmpty() && (!hasMedia || !hasAllFiles) -> Box(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         PermissionMissingPrompt(
                             hasMedia = hasMedia,
@@ -185,12 +191,13 @@ fun QuickCleanScreen(
                         )
                     }
                     state.items.isEmpty() -> Box(
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(stringResource(R.string.qc_empty))
                     }
                     else -> {
+                    Column(modifier = Modifier.fillMaxSize()) {
                         Text(
                             stringResource(
                                 R.string.qc_count_total,
@@ -217,6 +224,8 @@ fun QuickCleanScreen(
                             }
                         }
                     }
+                    }
+                }
                 }
 
                 if (state.selected.isNotEmpty()) {

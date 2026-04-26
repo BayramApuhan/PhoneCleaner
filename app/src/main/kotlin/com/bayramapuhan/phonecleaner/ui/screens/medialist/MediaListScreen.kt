@@ -36,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -185,15 +186,19 @@ fun MediaListScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            Box(modifier = Modifier.weight(1f)) {
+            PullToRefreshBox(
+                isRefreshing = state.loading,
+                onRefresh = { vm.load() },
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            ) {
                 when {
-                    state.loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    state.loading && state.items.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                     state.visible.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(stringResource(R.string.medialist_empty))
                     }
-                    else -> LazyColumn {
+                    else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
                         items(state.visible, key = { it.id }) { item ->
                             ListItem(
                                 modifier = Modifier.clickable { vm.toggleSelect(item.id) },

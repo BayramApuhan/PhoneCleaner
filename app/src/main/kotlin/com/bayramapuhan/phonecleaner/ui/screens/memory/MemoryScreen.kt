@@ -2,6 +2,8 @@ package com.bayramapuhan.phonecleaner.ui.screens.memory
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,40 +69,46 @@ fun MemoryScreen(
             )
         },
     ) { padding ->
-        val info = state.info
-        if (info == null) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("…")
-            }
-            return@Scaffold
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
+        PullToRefreshBox(
+            isRefreshing = state.loading,
+            onRefresh = { vm.refresh() },
+            modifier = Modifier.fillMaxSize().padding(padding),
         ) {
-            MemoryCard(info)
-
-            Spacer(Modifier.height(16.dp))
-
-            if (info.lowMemory) {
-                LowMemoryBanner()
-                Spacer(Modifier.height(16.dp))
+            val info = state.info
+            if (info == null) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("…")
+                }
+                return@PullToRefreshBox
             }
 
-            DisclaimerCard()
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = { vm.openSystemAppList() },
-                modifier = Modifier.fillMaxWidth(),
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
             ) {
-                Icon(Icons.Default.Settings, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.memory_open_system))
+                MemoryCard(info)
+
+                Spacer(Modifier.height(16.dp))
+
+                if (info.lowMemory) {
+                    LowMemoryBanner()
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                DisclaimerCard()
+
+                Spacer(Modifier.height(16.dp))
+
+                Button(
+                    onClick = { vm.openSystemAppList() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Default.Settings, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.memory_open_system))
+                }
             }
         }
     }
