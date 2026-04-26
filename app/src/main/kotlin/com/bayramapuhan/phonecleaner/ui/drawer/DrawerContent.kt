@@ -19,10 +19,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Info
@@ -65,6 +68,7 @@ import com.bayramapuhan.phonecleaner.domain.model.ThemeMode
 
 @Composable
 fun DrawerContent(
+    onClose: () -> Unit,
     onNavigateAppearance: () -> Unit,
     onNavigateLanguage: () -> Unit,
     onNavigateChangePassword: () -> Unit,
@@ -110,6 +114,7 @@ fun DrawerContent(
                 .verticalScroll(rememberScrollState())
                 .padding(vertical = 12.dp),
         ) {
+            DrawerHeader(onClose = onClose)
             ProCard(
                 onMoreInfo = { proDialog = true },
                 onRestore = { restoreDialog = true },
@@ -219,6 +224,45 @@ fun DrawerContent(
                 TextButton(onClick = { restoreDialog = false }) { Text(stringResource(android.R.string.ok)) }
             },
         )
+    }
+}
+
+@Composable
+private fun DrawerHeader(onClose: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClose)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.Default.CleaningServices,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+        Spacer(Modifier.size(12.dp))
+        Text(
+            stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = onClose) {
+            Icon(
+                Icons.Default.Close,
+                contentDescription = stringResource(R.string.drawer_close),
+            )
+        }
     }
 }
 

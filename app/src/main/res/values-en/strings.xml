@@ -111,6 +111,7 @@
 
     <!-- Drawer -->
     <string name="drawer_open">Open menu</string>
+    <string name="drawer_close">Close menu</string>
     <string name="drawer_pro_title">Upgrade to Pro</string>
     <string name="drawer_pro_desc">Unlimited cleaning, private space and more.</string>
     <string name="drawer_pro_more_info">More info</string>

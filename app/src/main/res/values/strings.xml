@@ -111,6 +111,7 @@
 
     <!-- Drawer -->
     <string name="drawer_open">Menüyü aç</string>
+    <string name="drawer_close">Menüyü kapat</string>
     <string name="drawer_pro_title">Pro\'ya Yükselt</string>
     <string name="drawer_pro_desc">Sınırsız temizlik, gizli alan ve daha fazlası.</string>
     <string name="drawer_pro_more_info">Daha Fazla Bilgi</string>

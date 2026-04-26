@@ -114,6 +114,7 @@ fun HomeScreen(
         drawerState = drawerState,
         drawerContent = {
             DrawerContent(
+                onClose = { scope.launch { drawerState.close() } },
                 onNavigateAppearance = { closeDrawerThen(onOpenAppearance) },
                 onNavigateLanguage = { closeDrawerThen(onOpenLanguage) },
                 onNavigateChangePassword = { closeDrawerThen(onOpenChangePassword) },
