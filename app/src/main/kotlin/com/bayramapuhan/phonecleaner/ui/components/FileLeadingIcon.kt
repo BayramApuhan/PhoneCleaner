@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -93,8 +95,9 @@ private sealed interface AudioSource {
 @Composable
 private fun AudioThumb(source: AudioSource, ext: String) {
     val context = LocalContext.current
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, source) {
-        value = withContext(Dispatchers.IO) {
+    var bitmap by remember(source) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(source) {
+        val loaded = withContext(Dispatchers.IO) {
             val retriever = MediaMetadataRetriever()
             try {
                 when (source) {
@@ -110,10 +113,12 @@ private fun AudioThumb(source: AudioSource, ext: String) {
                 runCatching { retriever.release() }
             }
         }
+        bitmap = loaded
     }
-    if (bitmap != null) {
+    val bmp = bitmap
+    if (bmp != null) {
         Image(
-            bitmap = bitmap!!,
+            bitmap = bmp,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
