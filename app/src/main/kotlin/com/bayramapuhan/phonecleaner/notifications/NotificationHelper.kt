@@ -17,6 +17,7 @@ import com.bayramapuhan.phonecleaner.R
 object NotificationHelper {
     const val CHANNEL_CLEANUP = "cleanup_reminders"
     const val NOTIF_STORAGE_LOW = 1001
+    private const val ACCENT_COLOR = 0xFF06B6D4.toInt()
 
     fun ensureChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -49,7 +50,8 @@ object NotificationHelper {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val notif = NotificationCompat.Builder(context, CHANNEL_CLEANUP)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setColor(ACCENT_COLOR)
             .setContentTitle(context.getString(R.string.notif_storage_low_title))
             .setContentText(context.getString(R.string.notif_storage_low_body, freeText))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
