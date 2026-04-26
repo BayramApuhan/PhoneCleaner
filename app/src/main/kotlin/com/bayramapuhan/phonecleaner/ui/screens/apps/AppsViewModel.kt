@@ -6,6 +6,7 @@ import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.data.repository.AppRepository
 import com.bayramapuhan.phonecleaner.domain.model.AppItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,10 +45,21 @@ class AppsViewModel @Inject constructor(
         }
     }
 
-    fun load() {
+    fun load() = doLoad(initialDelayMs = 0)
+
+    /**
+     * Pull-to-refresh and post-uninstall reload. The 500ms delay gives the
+     * PackageManager time to finish propagating the uninstall before we
+     * query getInstalledPackages — otherwise the freshly removed app can
+     * still appear in the list for one or two seconds on some OEMs.
+     */
+    fun refresh() = doLoad(initialDelayMs = 500)
+
+    private fun doLoad(initialDelayMs: Long) {
         viewModelScope.launch {
-            val hideSystem = prefs.hideSystemApps.first()
             _state.update { it.copy(loading = true) }
+            if (initialDelayMs > 0) delay(initialDelayMs)
+            val hideSystem = prefs.hideSystemApps.first()
             val list = runCatching { repo.loadInstalledApps(includeSystem = !hideSystem) }
                 .getOrDefault(emptyList())
             _state.update { it.copy(loading = false, apps = sorted(list, it.sort)) }

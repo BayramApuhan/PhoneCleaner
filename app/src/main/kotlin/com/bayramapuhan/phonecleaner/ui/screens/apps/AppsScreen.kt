@@ -59,7 +59,7 @@ fun AppsScreen(
     var pendingUninstall by remember { mutableStateOf<AppItem?>(null) }
     val uninstallLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
-    ) { vm.load() }
+    ) { vm.refresh() }
 
     pendingUninstall?.let { app ->
         AlertDialog(
@@ -151,7 +151,7 @@ fun AppsScreen(
                 }
                 else -> PullToRefreshBox(
                     isRefreshing = state.loading,
-                    onRefresh = { vm.load() },
+                    onRefresh = { vm.refresh() },
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
