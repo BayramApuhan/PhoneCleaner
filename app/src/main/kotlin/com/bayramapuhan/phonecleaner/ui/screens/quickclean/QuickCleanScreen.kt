@@ -28,6 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,15 +37,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,17 +56,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.domain.model.CleanableItem
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
 import com.bayramapuhan.phonecleaner.ui.components.DeletingOverlay
 import com.bayramapuhan.phonecleaner.ui.components.FileLeadingIcon
 import com.bayramapuhan.phonecleaner.ui.components.MediaThumb
+import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +100,26 @@ fun QuickCleanScreen(
         pendingDiskAfterMedia = emptyList()
     }
 
-    LaunchedEffect(Unit) { vm.load() }
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var permTick by remember { mutableIntStateOf(0) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) permTick++
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val hasMedia = remember(permTick) { Permissions.hasMediaRead(context) }
+    val hasAllFiles = remember(permTick) { Permissions.hasAllFilesAccess() }
+
+    val mediaPermLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { permTick++ }
+
+    LaunchedEffect(permTick, hasMedia, hasAllFiles) {
+        if (hasMedia || hasAllFiles) vm.load()
+    }
 
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -143,6 +173,16 @@ fun QuickCleanScreen(
                             Spacer(Modifier.height(8.dp))
                             Text(stringResource(R.string.qc_scanning))
                         }
+                    }
+                    state.items.isEmpty() && (!hasMedia || !hasAllFiles) -> Box(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                    ) {
+                        PermissionMissingPrompt(
+                            hasMedia = hasMedia,
+                            hasAllFiles = hasAllFiles,
+                            onGrantMedia = { mediaPermLauncher.launch(Permissions.mediaPermissions()) },
+                            onGrantAllFiles = { Permissions.openAllFilesAccessSettings(context) },
+                        )
                     }
                     state.items.isEmpty() -> Box(
                         modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -201,6 +241,81 @@ fun QuickCleanScreen(
         }
 
         DeletingOverlay(visible = state.deleting)
+    }
+}
+
+@Composable
+private fun PermissionMissingPrompt(
+    hasMedia: Boolean,
+    hasAllFiles: Boolean,
+    onGrantMedia: () -> Unit,
+    onGrantAllFiles: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            stringResource(R.string.qc_perm_title),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            stringResource(R.string.qc_perm_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(20.dp))
+        if (!hasMedia) {
+            PermissionRow(
+                icon = Icons.Default.PhotoLibrary,
+                accent = Color(0xFFEC4899),
+                title = stringResource(R.string.onboarding_media_title),
+                onGrant = onGrantMedia,
+            )
+            Spacer(Modifier.height(10.dp))
+        }
+        if (!hasAllFiles) {
+            PermissionRow(
+                icon = Icons.Default.FolderOpen,
+                accent = Color(0xFFF97316),
+                title = stringResource(R.string.onboarding_allfiles_title),
+                onGrant = onGrantAllFiles,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PermissionRow(
+    icon: ImageVector,
+    accent: Color,
+    title: String,
+    onGrant: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(accent),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, contentDescription = null, tint = Color.White)
+        }
+        Spacer(Modifier.size(12.dp))
+        Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+        OutlinedButton(onClick = onGrant) { Text(stringResource(R.string.onboarding_grant)) }
     }
 }
 

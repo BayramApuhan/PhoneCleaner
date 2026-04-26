@@ -178,6 +178,8 @@
     <string name="qc_title">Quick Clean</string>
     <string name="qc_scanning">Scanning your phone…</string>
     <string name="qc_empty">Nothing to clean up.</string>
+    <string name="qc_perm_title">Can\'t scan yet</string>
+    <string name="qc_perm_body">PhoneCleaner needs the permissions below before it can look through your phone\'s content.</string>
     <string name="qc_count_total">%1$d items · %2$s</string>
     <string name="qc_delete_btn">Delete (%1$d · %2$s)</string>
     <string name="qc_cat_photo">Photo</string>

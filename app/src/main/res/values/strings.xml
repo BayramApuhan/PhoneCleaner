@@ -178,6 +178,8 @@
     <string name="qc_title">Hızlı Temizlik</string>
     <string name="qc_scanning">Telefonun taranıyor…</string>
     <string name="qc_empty">Temizlenecek bir şey bulunamadı.</string>
+    <string name="qc_perm_title">Henüz tarayamıyoruz</string>
+    <string name="qc_perm_body">Telefonundaki içerikleri taramak için önce ilgili izinlerin verilmesi gerekiyor.</string>
     <string name="qc_count_total">%1$d öğe · %2$s</string>
     <string name="qc_delete_btn">Sil (%1$d · %2$s)</string>
     <string name="qc_cat_photo">Foto</string>
