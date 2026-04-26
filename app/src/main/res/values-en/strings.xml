@@ -107,6 +107,72 @@
     <string name="about_source_code">Source code</string>
     <string name="about_copyright">© 2026 Bayram Apuhan</string>
 
+    <!-- Drawer -->
+    <string name="drawer_open">Open menu</string>
+    <string name="drawer_pro_title">Upgrade to Pro</string>
+    <string name="drawer_pro_desc">Unlimited cleaning, private space and more.</string>
+    <string name="drawer_pro_more_info">More info</string>
+    <string name="drawer_pro_restore">Restore purchase</string>
+    <string name="drawer_section_general">General</string>
+    <string name="drawer_section_private">Private space</string>
+    <string name="drawer_section_about">About</string>
+    <string name="drawer_notifications">Notifications</string>
+    <string name="drawer_appearance">Appearance</string>
+    <string name="drawer_language">Language</string>
+    <string name="drawer_password">Password</string>
+    <string name="drawer_change_password">Change password</string>
+    <string name="drawer_recovery_email">Recovery email</string>
+    <string name="drawer_biometric">Biometric lock</string>
+    <string name="drawer_rate">Rate on store</string>
+    <string name="drawer_faq">FAQ</string>
+    <string name="drawer_feedback">Feedback</string>
+
+    <!-- Pro -->
+    <string name="pro_dialog_title">Upgrade to Pro</string>
+    <string name="pro_dialog_body">Pro subscription is coming soon. We\'ll let you know when it lands.</string>
+    <string name="pro_restore_dialog_title">Restore purchase</string>
+    <string name="pro_restore_dialog_body">No active Pro purchase was found.</string>
+
+    <!-- Appearance / Language -->
+    <string name="appearance_title">Appearance</string>
+    <string name="appearance_theme">Theme</string>
+    <string name="language_title">Language</string>
+    <string name="language_system">System language</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+
+    <!-- Private zone subpages -->
+    <string name="change_password_title">Change password</string>
+    <string name="change_password_current">Current password</string>
+    <string name="change_password_new">New password</string>
+    <string name="change_password_confirm">Confirm new password</string>
+    <string name="change_password_save">Save</string>
+    <string name="change_password_placeholder">Enable \"Password\" first to set a PIN.</string>
+    <string name="password_error_wrong">Current password is wrong.</string>
+    <string name="password_error_mismatch">New passwords don\'t match.</string>
+    <string name="password_error_short">Password must be at least 4 characters.</string>
+    <string name="password_min_hint">At least 4 characters. After enabling you can also use biometric unlock.</string>
+    <string name="recovery_email_saved">Recovery email saved.</string>
+    <string name="recovery_email_invalid">Invalid email address.</string>
+    <string name="recovery_email_title">Recovery email</string>
+    <string name="recovery_email_hint">name@example.com</string>
+    <string name="recovery_email_save">Save</string>
+    <string name="recovery_email_desc">If you forget your password we\'ll send a reset link to this address.</string>
+
+    <!-- FAQ / Feedback -->
+    <string name="faq_title">FAQ</string>
+    <string name="faq_q1">Does the app delete my files?</string>
+    <string name="faq_a1">No. It only deletes files you explicitly confirm. You always see a confirmation dialog before deletion.</string>
+    <string name="faq_q2">Why is there no RAM \"boost\" button?</string>
+    <string name="faq_a2">Android 8+ manages memory automatically. Third-party apps cannot kill other processes; \"boost\" buttons are cosmetic.</string>
+    <string name="faq_q3">Is my data sent to a server?</string>
+    <string name="faq_a3">No. All scanning and analysis runs on-device. No file or statistic is sent over the network.</string>
+    <string name="feedback_title">Feedback</string>
+    <string name="feedback_subject">PhoneCleaner Feedback</string>
+    <string name="feedback_hint">Write your thoughts here…</string>
+    <string name="feedback_send">Send by email</string>
+    <string name="feedback_no_email_app">No email app found.</string>
+
     <!-- Common -->
     <string name="confirm_delete_title">Confirm deletion</string>
     <string name="confirm_delete_body">%1$d items (%2$s) will be permanently deleted. This cannot be undone.</string>

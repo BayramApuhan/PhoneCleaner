@@ -9,13 +9,19 @@ import androidx.navigation.navArgument
 import com.bayramapuhan.phonecleaner.domain.model.CategoryType
 import com.bayramapuhan.phonecleaner.ui.screens.about.AboutScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apk.ApkScreen
+import com.bayramapuhan.phonecleaner.ui.screens.appearance.AppearanceScreen
 import com.bayramapuhan.phonecleaner.ui.screens.apps.AppsScreen
+import com.bayramapuhan.phonecleaner.ui.screens.faq.FaqScreen
+import com.bayramapuhan.phonecleaner.ui.screens.feedback.FeedbackScreen
 import com.bayramapuhan.phonecleaner.ui.screens.home.HomeScreen
+import com.bayramapuhan.phonecleaner.ui.screens.language.LanguageScreen
 import com.bayramapuhan.phonecleaner.ui.screens.largefiles.LargeFilesScreen
 import com.bayramapuhan.phonecleaner.ui.screens.medialist.MediaListScreen
 import com.bayramapuhan.phonecleaner.ui.screens.memory.MemoryScreen
 import com.bayramapuhan.phonecleaner.ui.screens.other.OtherFilesScreen
+import com.bayramapuhan.phonecleaner.ui.screens.password.ChangePasswordScreen
 import com.bayramapuhan.phonecleaner.ui.screens.photos.PhotosScreen
+import com.bayramapuhan.phonecleaner.ui.screens.recovery.RecoveryEmailScreen
 import com.bayramapuhan.phonecleaner.ui.screens.settings.SettingsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.storage.StorageScreen
 
@@ -31,6 +37,12 @@ object Routes {
     const val MEMORY = "memory"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+    const val APPEARANCE = "appearance"
+    const val LANGUAGE = "language"
+    const val CHANGE_PASSWORD = "change_password"
+    const val RECOVERY_EMAIL = "recovery_email"
+    const val FAQ = "faq"
+    const val FEEDBACK = "feedback"
 
     fun mediaRoute(type: String) = "media/$type"
 }
@@ -48,6 +60,13 @@ fun AppNavGraph() {
                 onOpenApk = { nav.navigate(Routes.APK) },
                 onOpenMemory = { nav.navigate(Routes.MEMORY) },
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
+                onOpenAppearance = { nav.navigate(Routes.APPEARANCE) },
+                onOpenLanguage = { nav.navigate(Routes.LANGUAGE) },
+                onOpenChangePassword = { nav.navigate(Routes.CHANGE_PASSWORD) },
+                onOpenRecoveryEmail = { nav.navigate(Routes.RECOVERY_EMAIL) },
+                onOpenAbout = { nav.navigate(Routes.ABOUT) },
+                onOpenFaq = { nav.navigate(Routes.FAQ) },
+                onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
             )
         }
         composable(Routes.STORAGE) {
@@ -83,5 +102,16 @@ fun AppNavGraph() {
             )
         }
         composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.APPEARANCE) { AppearanceScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.LANGUAGE) { LanguageScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.CHANGE_PASSWORD) {
+            ChangePasswordScreen(
+                onBack = { nav.popBackStack() },
+                onSaved = { nav.popBackStack() },
+            )
+        }
+        composable(Routes.RECOVERY_EMAIL) { RecoveryEmailScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.FAQ) { FaqScreen(onBack = { nav.popBackStack() }) }
+        composable(Routes.FEEDBACK) { FeedbackScreen(onBack = { nav.popBackStack() }) }
     }
 }

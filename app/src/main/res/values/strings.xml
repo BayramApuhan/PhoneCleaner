@@ -107,6 +107,72 @@
     <string name="about_source_code">Kaynak kod</string>
     <string name="about_copyright">© 2026 Bayram Apuhan</string>
 
+    <!-- Drawer -->
+    <string name="drawer_open">Menüyü aç</string>
+    <string name="drawer_pro_title">Pro\'ya Yükselt</string>
+    <string name="drawer_pro_desc">Sınırsız temizlik, gizli alan ve daha fazlası.</string>
+    <string name="drawer_pro_more_info">Daha Fazla Bilgi</string>
+    <string name="drawer_pro_restore">Geri Yükle</string>
+    <string name="drawer_section_general">Genel</string>
+    <string name="drawer_section_private">Özel Alan</string>
+    <string name="drawer_section_about">Hakkında</string>
+    <string name="drawer_notifications">Bildirim</string>
+    <string name="drawer_appearance">Görünüş</string>
+    <string name="drawer_language">Dil</string>
+    <string name="drawer_password">Parola</string>
+    <string name="drawer_change_password">Parolayı Değiştir</string>
+    <string name="drawer_recovery_email">Kurtarma E-postası</string>
+    <string name="drawer_biometric">Biometrik Kilit</string>
+    <string name="drawer_rate">Mağazada oy verin</string>
+    <string name="drawer_faq">Sıkça Sorulanlar</string>
+    <string name="drawer_feedback">Geri Bildirim</string>
+
+    <!-- Pro -->
+    <string name="pro_dialog_title">Pro\'ya Yükselt</string>
+    <string name="pro_dialog_body">Pro abonelik yakında. Eklendiğinde sana haber vereceğiz.</string>
+    <string name="pro_restore_dialog_title">Geri Yükle</string>
+    <string name="pro_restore_dialog_body">Henüz aktif bir Pro satın alma bulunamadı.</string>
+
+    <!-- Appearance / Language -->
+    <string name="appearance_title">Görünüş</string>
+    <string name="appearance_theme">Tema</string>
+    <string name="language_title">Dil</string>
+    <string name="language_system">Sistem dili</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_en">English</string>
+
+    <!-- Private zone subpages -->
+    <string name="change_password_title">Parolayı Değiştir</string>
+    <string name="change_password_current">Mevcut parola</string>
+    <string name="change_password_new">Yeni parola</string>
+    <string name="change_password_confirm">Yeni parolayı onayla</string>
+    <string name="change_password_save">Kaydet</string>
+    <string name="change_password_placeholder">Önce \"Parola\" özelliğini açıp PIN belirleyin.</string>
+    <string name="password_error_wrong">Mevcut parola yanlış.</string>
+    <string name="password_error_mismatch">Yeni parolalar eşleşmiyor.</string>
+    <string name="password_error_short">Parola en az 4 karakter olmalı.</string>
+    <string name="password_min_hint">En az 4 karakter. Açıldıktan sonra biometrik kilidi kullanabilirsin.</string>
+    <string name="recovery_email_saved">Kurtarma e-postası kaydedildi.</string>
+    <string name="recovery_email_invalid">Geçersiz e-posta adresi.</string>
+    <string name="recovery_email_title">Kurtarma E-postası</string>
+    <string name="recovery_email_hint">ornek@adres.com</string>
+    <string name="recovery_email_save">Kaydet</string>
+    <string name="recovery_email_desc">Parolanızı unutursanız bu adrese sıfırlama bağlantısı göndereceğiz.</string>
+
+    <!-- FAQ / Feedback -->
+    <string name="faq_title">Sıkça Sorulanlar</string>
+    <string name="faq_q1">Uygulama verilerimi siliyor mu?</string>
+    <string name="faq_a1">Hayır. Uygulama yalnızca senin onayladığın dosyaları siler. Silmeden önce her zaman onay diyaloğu görürsün.</string>
+    <string name="faq_q2">RAM \"boost\" butonu neden yok?</string>
+    <string name="faq_a2">Android 8 ve üzeri belleği otomatik yönetir. Üçüncü parti uygulamalar diğer süreçleri kapatamaz; \"boost\" butonları kozmetiktir.</string>
+    <string name="faq_q3">Verilerim sunucuya gidiyor mu?</string>
+    <string name="faq_a3">Hayır. Tüm tarama ve analiz cihazda gerçekleşir. Hiçbir dosya veya istatistik internet üzerinden gönderilmez.</string>
+    <string name="feedback_title">Geri Bildirim</string>
+    <string name="feedback_subject">PhoneCleaner Geri Bildirim</string>
+    <string name="feedback_hint">Görüşlerini buraya yaz…</string>
+    <string name="feedback_send">E-posta ile gönder</string>
+    <string name="feedback_no_email_app">E-posta uygulaması bulunamadı.</string>
+
     <!-- Common -->
     <string name="confirm_delete_title">Silmeyi onayla</string>
     <string name="confirm_delete_body">%1$d öğe (%2$s) kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
