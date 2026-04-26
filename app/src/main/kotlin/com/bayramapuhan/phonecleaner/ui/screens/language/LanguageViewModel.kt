@@ -2,6 +2,7 @@ package com.bayramapuhan.phonecleaner.ui.screens.language
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bayramapuhan.phonecleaner.PhoneCleanerApp
 import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,5 +20,6 @@ class LanguageViewModel @Inject constructor(
 
     fun setLanguage(code: String) = viewModelScope.launch {
         prefs.setLanguage(code)
+        PhoneCleanerApp.applyLocale(code)
     }
 }

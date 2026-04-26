@@ -154,6 +154,15 @@
     <string name="password_min_hint">En az 4 karakter. Açıldıktan sonra biometrik kilidi kullanabilirsin.</string>
     <string name="recovery_email_saved">Kurtarma e-postası kaydedildi.</string>
     <string name="recovery_email_invalid">Geçersiz e-posta adresi.</string>
+
+    <!-- Lock screen -->
+    <string name="lock_title">Uygulama kilitli</string>
+    <string name="lock_password_placeholder">Parola</string>
+    <string name="lock_unlock">Kilidi aç</string>
+    <string name="lock_use_biometric">Biometrik ile aç</string>
+    <string name="lock_biometric_title">Kilidi parmak iziyle aç</string>
+    <string name="lock_biometric_subtitle">PhoneCleaner kilitli. Devam etmek için kimliğini doğrula.</string>
+    <string name="lock_wrong_password">Parola yanlış.</string>
     <string name="recovery_email_title">Kurtarma E-postası</string>
     <string name="recovery_email_hint">ornek@adres.com</string>
     <string name="recovery_email_save">Kaydet</string>

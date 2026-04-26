@@ -154,6 +154,15 @@
     <string name="password_min_hint">At least 4 characters. After enabling you can also use biometric unlock.</string>
     <string name="recovery_email_saved">Recovery email saved.</string>
     <string name="recovery_email_invalid">Invalid email address.</string>
+
+    <!-- Lock screen -->
+    <string name="lock_title">App is locked</string>
+    <string name="lock_password_placeholder">Password</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_use_biometric">Use biometric</string>
+    <string name="lock_biometric_title">Unlock with biometric</string>
+    <string name="lock_biometric_subtitle">PhoneCleaner is locked. Authenticate to continue.</string>
+    <string name="lock_wrong_password">Wrong password.</string>
     <string name="recovery_email_title">Recovery email</string>
     <string name="recovery_email_hint">name@example.com</string>
     <string name="recovery_email_save">Save</string>
