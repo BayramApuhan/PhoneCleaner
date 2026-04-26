@@ -1,10 +1,8 @@
 package com.bayramapuhan.phonecleaner.data.repository
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import com.bayramapuhan.phonecleaner.domain.model.AppItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -34,13 +32,5 @@ class AppRepository @Inject constructor(
                 installedAt = pkg.firstInstallTime,
             )
         }.sortedByDescending { it.sizeBytes }
-    }
-
-    fun launchUninstall(packageName: String) {
-        val intent = Intent(Intent.ACTION_DELETE).apply {
-            data = Uri.parse("package:$packageName")
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(intent)
     }
 }

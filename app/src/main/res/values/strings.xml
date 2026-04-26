@@ -170,6 +170,24 @@
     <string name="notif_storage_low_title">Depolama doluyor</string>
     <string name="notif_storage_low_body">Yalnızca %1$s boş kaldı. Şimdi temizleyelim mi?</string>
     <string name="notif_permission_denied">Bildirim için sistemden izin gerekli. Ayarlar\'dan vermeyi unutmayın.</string>
+
+    <!-- Quick clean hub -->
+    <string name="qc_title">Hızlı Temizlik</string>
+    <string name="qc_subtitle">Yer kazanmak için bir kategori seç.</string>
+    <string name="qc_duplicates">Çift Fotoğraflar</string>
+    <string name="qc_duplicates_desc">Aynı kareleri bul, fazlasını sil</string>
+    <string name="qc_large_files">Büyük Dosyalar</string>
+    <string name="qc_large_files_desc">Yer kaplayanları gözden geçir</string>
+    <string name="qc_apk">APK Dosyaları</string>
+    <string name="qc_apk_desc">Yüklenen kurulum paketleri</string>
+    <string name="qc_apps">Uygulamalar</string>
+    <string name="qc_apps_desc">Az kullanılanları kaldır</string>
+    <string name="qc_photos">Fotoğraflar</string>
+    <string name="qc_photos_desc">Galerini gözden geçir</string>
+    <string name="qc_videos">Videolar</string>
+    <string name="qc_videos_desc">Eski kayıtları temizle</string>
+    <string name="qc_audio">Sesler</string>
+    <string name="qc_audio_desc">Müzik ve ses dosyaları</string>
     <string name="recovery_email_title">Kurtarma E-postası</string>
     <string name="recovery_email_hint">ornek@adres.com</string>
     <string name="recovery_email_save">Kaydet</string>

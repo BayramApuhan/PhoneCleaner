@@ -1,9 +1,12 @@
 package com.bayramapuhan.phonecleaner.ui.components
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -12,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private val IMAGE_EXTS = setOf("jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif")
@@ -42,21 +49,77 @@ fun FileLeadingIcon(
         contentAlignment = Alignment.Center,
     ) {
         when {
-            ext in IMAGE_EXTS -> AsyncImage(
+            ext in IMAGE_EXTS || ext in VIDEO_EXTS -> AsyncImage(
                 model = File(path),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
-            ext in VIDEO_EXTS -> AsyncImage(
-                model = File(path),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
+            ext in AUDIO_EXTS -> AudioThumb(source = AudioSource.PathSource(path), ext = ext)
             ext == "apk" -> ApkIconView(path)
             else -> ExtBadge(ext)
         }
+    }
+}
+
+@Composable
+fun MediaThumb(
+    uri: Uri,
+    isVideo: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.clip(RoundedCornerShape(10.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (isVideo) {
+            AsyncImage(
+                model = uri,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            AudioThumb(source = AudioSource.UriSource(uri), ext = "audio")
+        }
+    }
+}
+
+private sealed interface AudioSource {
+    data class PathSource(val path: String) : AudioSource
+    data class UriSource(val uri: Uri) : AudioSource
+}
+
+@Composable
+private fun AudioThumb(source: AudioSource, ext: String) {
+    val context = LocalContext.current
+    val bitmap by produceState<ImageBitmap?>(initialValue = null, source) {
+        value = withContext(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
+            try {
+                when (source) {
+                    is AudioSource.PathSource -> retriever.setDataSource(source.path)
+                    is AudioSource.UriSource -> retriever.setDataSource(context, source.uri)
+                }
+                retriever.embeddedPicture?.let { bytes ->
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                }
+            } catch (_: Throwable) {
+                null
+            } finally {
+                runCatching { retriever.release() }
+            }
+        }
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap!!,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+    } else {
+        ExtBadge(ext)
     }
 }
 
@@ -111,6 +174,7 @@ private fun extStyle(ext: String): Pair<Color, String> = when (ext) {
     "txt", "log", "md", "rtf" -> Color(0xFF64748B) to "TXT"
     "json", "xml", "html", "yaml", "yml" -> Color(0xFF0EA5E9) to "</>"
     "apk" -> Color(0xFF14B8A6) to "APK"
+    "audio" -> Color(0xFFF59E0B) to "♪"
     in AUDIO_EXTS -> Color(0xFFF59E0B) to "♪"
     "" -> Color(0xFF94A3B8) to "?"
     else -> Color(0xFF64748B) to ext.take(3).uppercase()

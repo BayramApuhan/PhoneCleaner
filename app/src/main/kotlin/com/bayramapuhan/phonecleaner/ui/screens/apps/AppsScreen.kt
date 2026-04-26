@@ -1,5 +1,9 @@
 package com.bayramapuhan.phonecleaner.ui.screens.apps
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +50,9 @@ fun AppsScreen(
     vm: AppsViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsState()
+    val uninstallLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { vm.load() }
 
     Scaffold(
         topBar = {
@@ -114,7 +121,13 @@ fun AppsScreen(
                             headlineContent = { Text(app.label) },
                             supportingContent = { Text("${app.packageName} · ${app.sizeBytes.formatSize()}") },
                             trailingContent = {
-                                TextButton(onClick = { vm.uninstall(app.packageName) }) {
+                                TextButton(onClick = {
+                                    val intent = Intent(
+                                        Intent.ACTION_DELETE,
+                                        Uri.parse("package:${app.packageName}"),
+                                    )
+                                    uninstallLauncher.launch(intent)
+                                }) {
                                     Text(stringResource(R.string.apps_uninstall))
                                 }
                             },

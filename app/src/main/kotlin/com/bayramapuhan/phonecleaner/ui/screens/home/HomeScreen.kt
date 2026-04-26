@@ -83,6 +83,7 @@ fun HomeScreen(
     onOpenApk: () -> Unit,
     onOpenMemory: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenQuickClean: () -> Unit,
     onOpenAppearance: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenChangePassword: () -> Unit,
@@ -158,7 +159,7 @@ fun HomeScreen(
             item(span = { GridItemSpan(maxLineSpan) }) {
                 HeroStorageCard(
                     storage = state.storage,
-                    onQuickClean = onOpenLargeFiles,
+                    onQuickClean = onOpenQuickClean,
                 )
             }
             items(tiles) { tile -> FeatureCard(tile) }

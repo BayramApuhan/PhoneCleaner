@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.R
 import com.bayramapuhan.phonecleaner.ui.components.ConfirmDeleteDialog
+import com.bayramapuhan.phonecleaner.ui.components.MediaThumb
 import com.bayramapuhan.phonecleaner.util.Permissions
 import com.bayramapuhan.phonecleaner.util.formatSize
 
@@ -186,22 +187,11 @@ fun MediaListScreen(
                             ListItem(
                                 modifier = Modifier.clickable { vm.toggleSelect(item.id) },
                                 leadingContent = {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(44.dp)
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(typeColor(state.type).copy(alpha = 0.18f)),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Icon(
-                                            when (state.type) {
-                                                MediaListType.VIDEOS -> Icons.Default.PlayCircle
-                                                MediaListType.AUDIO -> Icons.Default.Audiotrack
-                                            },
-                                            contentDescription = null,
-                                            tint = typeColor(state.type),
-                                        )
-                                    }
+                                    MediaThumb(
+                                        uri = item.uri,
+                                        isVideo = state.type == MediaListType.VIDEOS,
+                                        modifier = Modifier.size(48.dp),
+                                    )
                                 },
                                 headlineContent = { Text(item.displayName, maxLines = 1) },
                                 supportingContent = { Text(item.sizeBytes.formatSize()) },

@@ -170,6 +170,24 @@
     <string name="notif_storage_low_title">Storage almost full</string>
     <string name="notif_storage_low_body">Only %1$s left free. Want to clean up now?</string>
     <string name="notif_permission_denied">Notifications need permission from the system. Grant it from Settings.</string>
+
+    <!-- Quick clean hub -->
+    <string name="qc_title">Quick Clean</string>
+    <string name="qc_subtitle">Pick a category to free up space.</string>
+    <string name="qc_duplicates">Duplicate Photos</string>
+    <string name="qc_duplicates_desc">Find and remove repeats</string>
+    <string name="qc_large_files">Large Files</string>
+    <string name="qc_large_files_desc">Review the biggest files</string>
+    <string name="qc_apk">APK Files</string>
+    <string name="qc_apk_desc">Leftover install packages</string>
+    <string name="qc_apps">Apps</string>
+    <string name="qc_apps_desc">Uninstall what you don\'t use</string>
+    <string name="qc_photos">Photos</string>
+    <string name="qc_photos_desc">Browse your gallery</string>
+    <string name="qc_videos">Videos</string>
+    <string name="qc_videos_desc">Clean up old recordings</string>
+    <string name="qc_audio">Audio</string>
+    <string name="qc_audio_desc">Music and sound files</string>
     <string name="recovery_email_title">Recovery email</string>
     <string name="recovery_email_hint">name@example.com</string>
     <string name="recovery_email_save">Save</string>

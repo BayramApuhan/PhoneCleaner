@@ -3,6 +3,9 @@ package com.bayramapuhan.phonecleaner
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.VideoFrameDecoder
 import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.notifications.CleanupReminderWorker
 import com.bayramapuhan.phonecleaner.notifications.NotificationHelper
@@ -15,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 @HiltAndroidApp
-class PhoneCleanerApp : Application() {
+class PhoneCleanerApp : Application(), ImageLoaderFactory {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)
@@ -38,6 +41,11 @@ class PhoneCleanerApp : Application() {
             CleanupReminderWorker.cancel(this)
         }
     }
+
+    override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
+        .components { add(VideoFrameDecoder.Factory()) }
+        .crossfade(true)
+        .build()
 
     companion object {
         fun applyLocale(code: String) {

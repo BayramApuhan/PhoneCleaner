@@ -21,6 +21,7 @@ import com.bayramapuhan.phonecleaner.ui.screens.memory.MemoryScreen
 import com.bayramapuhan.phonecleaner.ui.screens.other.OtherFilesScreen
 import com.bayramapuhan.phonecleaner.ui.screens.password.ChangePasswordScreen
 import com.bayramapuhan.phonecleaner.ui.screens.photos.PhotosScreen
+import com.bayramapuhan.phonecleaner.ui.screens.quickclean.QuickCleanScreen
 import com.bayramapuhan.phonecleaner.ui.screens.recovery.RecoveryEmailScreen
 import com.bayramapuhan.phonecleaner.ui.screens.settings.SettingsScreen
 import com.bayramapuhan.phonecleaner.ui.screens.storage.StorageScreen
@@ -43,6 +44,7 @@ object Routes {
     const val RECOVERY_EMAIL = "recovery_email"
     const val FAQ = "faq"
     const val FEEDBACK = "feedback"
+    const val QUICK_CLEAN = "quick_clean"
 
     fun mediaRoute(type: String) = "media/$type"
 }
@@ -60,6 +62,7 @@ fun AppNavGraph() {
                 onOpenApk = { nav.navigate(Routes.APK) },
                 onOpenMemory = { nav.navigate(Routes.MEMORY) },
                 onOpenSettings = { nav.navigate(Routes.SETTINGS) },
+                onOpenQuickClean = { nav.navigate(Routes.QUICK_CLEAN) },
                 onOpenAppearance = { nav.navigate(Routes.APPEARANCE) },
                 onOpenLanguage = { nav.navigate(Routes.LANGUAGE) },
                 onOpenChangePassword = { nav.navigate(Routes.CHANGE_PASSWORD) },
@@ -67,6 +70,18 @@ fun AppNavGraph() {
                 onOpenAbout = { nav.navigate(Routes.ABOUT) },
                 onOpenFaq = { nav.navigate(Routes.FAQ) },
                 onOpenFeedback = { nav.navigate(Routes.FEEDBACK) },
+            )
+        }
+        composable(Routes.QUICK_CLEAN) {
+            QuickCleanScreen(
+                onBack = { nav.popBackStack() },
+                onOpenDuplicates = { nav.navigate(Routes.PHOTOS) },
+                onOpenLargeFiles = { nav.navigate(Routes.LARGE_FILES) },
+                onOpenApk = { nav.navigate(Routes.APK) },
+                onOpenApps = { nav.navigate(Routes.APPS) },
+                onOpenVideos = { nav.navigate(Routes.mediaRoute("videos")) },
+                onOpenAudio = { nav.navigate(Routes.mediaRoute("audio")) },
+                onOpenPhotos = { nav.navigate(Routes.PHOTOS) },
             )
         }
         composable(Routes.STORAGE) {

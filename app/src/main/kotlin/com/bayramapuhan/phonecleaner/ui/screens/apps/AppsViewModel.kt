@@ -60,10 +60,6 @@ class AppsViewModel @Inject constructor(
 
     fun setQuery(q: String) = _state.update { it.copy(query = q) }
 
-    fun uninstall(packageName: String) {
-        repo.launchUninstall(packageName)
-    }
-
     private fun sorted(list: List<AppItem>, sort: AppSort): List<AppItem> = when (sort) {
         AppSort.SIZE -> list.sortedByDescending { it.sizeBytes }
         AppSort.NAME -> list.sortedBy { it.label.lowercase() }
