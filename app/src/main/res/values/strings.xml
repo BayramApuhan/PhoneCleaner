@@ -54,6 +54,8 @@
     <string name="apps_sort_size">Boyuta göre</string>
     <string name="apps_sort_name">İsme göre</string>
     <string name="apps_uninstall">Kaldır</string>
+    <string name="apps_uninstall_confirm_title">Uygulamayı kaldır</string>
+    <string name="apps_uninstall_confirm_body">%1$s uygulamasını ve tüm verilerini telefondan kaldırmak istediğine emin misin? Bu işlem geri alınamaz.</string>
     <string name="apps_loading">Uygulamalar yükleniyor…</string>
 
     <!-- APK -->

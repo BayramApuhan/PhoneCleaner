@@ -1,6 +1,5 @@
 package com.bayramapuhan.phonecleaner.ui.screens.language
 
-import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,10 +22,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bayramapuhan.phonecleaner.PhoneCleanerApp
 import com.bayramapuhan.phonecleaner.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +35,6 @@ fun LanguageScreen(
     vm: LanguageViewModel = hiltViewModel(),
 ) {
     val current by vm.language.collectAsState()
-    val activity = LocalContext.current as? Activity
     val items = listOf(
         "system" to R.string.language_system,
         "tr" to R.string.language_tr,
@@ -45,8 +43,8 @@ fun LanguageScreen(
 
     fun pick(code: String) {
         if (code == current) return
+        PhoneCleanerApp.applyLocale(code)
         vm.setLanguage(code)
-        activity?.recreate()
     }
     Scaffold(
         topBar = {

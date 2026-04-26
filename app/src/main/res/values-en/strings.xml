@@ -54,6 +54,8 @@
     <string name="apps_sort_size">By size</string>
     <string name="apps_sort_name">By name</string>
     <string name="apps_uninstall">Uninstall</string>
+    <string name="apps_uninstall_confirm_title">Uninstall app</string>
+    <string name="apps_uninstall_confirm_body">Uninstall %1$s and remove all of its data from the device? This cannot be undone.</string>
     <string name="apps_loading">Loading apps…</string>
 
     <!-- APK -->

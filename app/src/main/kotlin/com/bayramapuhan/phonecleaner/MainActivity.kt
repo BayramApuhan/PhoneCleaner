@@ -3,6 +3,7 @@ package com.bayramapuhan.phonecleaner
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -11,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bayramapuhan.phonecleaner.data.preferences.AppPreferences
 import com.bayramapuhan.phonecleaner.domain.model.ThemeMode
@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
 
     @Inject lateinit var prefs: AppPreferences
 
